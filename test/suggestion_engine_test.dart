@@ -6,7 +6,7 @@ import 'package:sidequests/services/suggestion_engine.dart';
 void main() {
   test('golden hour boosts sunset viewpoints for sunset lovers', () {
     final profile = UserProfile(interests: {'sunsets', 'viewpoints'});
-    final evening = const QuestContext(
+    const evening = QuestContext(
       hour: 18,
       weekday: DateTime.friday,
       temperatureC: 19,
@@ -25,7 +25,7 @@ void main() {
 
   test('avoided tags are demoted below the top pick', () {
     final profile = UserProfile(avoid: {'live music'});
-    final saturday = const QuestContext(
+    const saturday = QuestContext(
       hour: 20,
       weekday: DateTime.saturday,
       temperatureC: 18,
@@ -45,7 +45,7 @@ void main() {
   });
 
   test('rain favors cozy indoor ideas', () {
-    final rainy = const QuestContext(
+    const rainy = QuestContext(
       hour: 15,
       weekday: DateTime.wednesday,
       temperatureC: 14,
@@ -62,7 +62,7 @@ void main() {
   });
 
   test('traveling surfaces local gems', () {
-    final away = const QuestContext(
+    const away = QuestContext(
       hour: 10,
       weekday: DateTime.saturday,
       temperatureC: 22,
