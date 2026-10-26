@@ -16,7 +16,7 @@ class PreferencesService {
   Future<UserProfile> load() async {
     try {
       final raw = _memory != null
-          ? _memory![_key] as String?
+          ? _memory[_key] as String?
           : (await SharedPreferences.getInstance()).getString(_key);
       if (raw == null || raw.isEmpty) return UserProfile();
       return UserProfile.fromJson(jsonDecode(raw) as Map<String, Object?>);
@@ -28,7 +28,7 @@ class PreferencesService {
   Future<void> save(UserProfile profile) async {
     final raw = jsonEncode(profile.toJson());
     if (_memory != null) {
-      _memory![_key] = raw;
+      _memory[_key] = raw;
       return;
     }
     try {

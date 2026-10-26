@@ -78,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
               final profiles = context.read<ProfileProvider>();
               final quests = context.read<QuestProvider>();
               await quests.sendNudge(profiles.profile);
-              if (!mounted) return;
+              if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Nudge sent — check your notifications.'),
