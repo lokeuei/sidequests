@@ -2,14 +2,14 @@
 
 - **Name:** `sidequests`
 - **Version:** 0.1.0 (stub contract; reasoning engine not yet live)
-- **Kind:** ongoing skill — always eligible, fires on moments not queries
+- **Kind:** ongoing skill, always eligible. It fires on moments, not queries.
 - **Client:** Sidequests Flutter app (Android now, iOS later)
 
 ## Purpose
 
 Nudge the user toward small real-world adventures based on who they are,
-where they are, and what the moment offers — so they put the phone down.
-The skill never generates feed content; it only ever returns a short list
+where they are, and what the moment offers, so they put the phone down.
+The skill never generates feed content; it only returns a short list
 of quests (see `reference/quest-format.md`) plus one plain-language reason.
 
 ## Activation
@@ -27,30 +27,30 @@ trip instead of a quest nudge.
 
 Full catalog: `reference/context-signals.md`. In priority order:
 
-1. **Learned profile** — interest weights from taps/saves/dismissals/goes.
+1. **Learned profile**: interest weights from taps/saves/dismissals/goes.
    Explicit love/avoid lists override learned weights on conflict.
-2. **Travel state** — traveling re-weights toward `local gems`, `history`,
+2. **Travel state**: traveling re-weights toward `local gems`, `history`,
    `viewpoints`, first-time sights.
-3. **Daylight** — golden hour (17–19h) boosts `sunsets`/`viewpoints`/`water`;
+3. **Daylight**: golden hour (17–19h) boosts `sunsets`/`viewpoints`/`water`;
    night boosts `night`/`stargazing`/`live music` and demotes plain `outdoors`.
-4. **Weather** (Open-Meteo WMO) — rain boosts `museums`/`cafes`/`food markets`
+4. **Weather** (Open-Meteo WMO): rain boosts `museums`/`cafes`/`food markets`
    and demotes `outdoors`; clear skies do the reverse.
-5. **Calendar-ish cues** — weekend boosts `social`/`food markets`/`live music`;
+5. **Calendar cues**: weekend boosts `social`/`food markets`/`live music`;
    morning boosts `mornings`/`cafes`/`quiet`.
-6. **Distance** — gentle penalty (~2 points/km, capped at −10). Never exclude
+6. **Distance**: gentle penalty (~2 points/km, capped at −10). Never exclude
    a perfect quest for distance; rank it lower and say why.
 
 ## Ranking contract (mirrors `rankQuests()` in the app)
 
 - Start every candidate at 50 points.
-- +12 per matching loved interest · −25 per matching avoided tag.
+- +12 per matching loved interest, −25 per matching avoided tag.
 - Learned weight × 3 per tag, clamped to [−15, +21].
 - Context boosts per Inputs above (golden hour +18, rain/indoor +16,
   night/made-for-tonight +14, travel +16, clear/outdoors +10, morning +10,
   clear/stargazing +8, weekend +6; demotions: rainy/outdoors −15,
   stargazing-by-day −12, outdoors-at-night −6).
 - Sort descending, return top 5. Reason = top two positive contributors
-  joined with ` · `, falling back to the quest's evergreen `why`.
+  joined with a comma, falling back to the quest's evergreen `why`.
 
 The live skill may use richer signals (events feed, sunset API, calendar)
 but MUST keep the same output shape and the "two contributors" reason style.
@@ -85,14 +85,15 @@ at rank time via the −25 penalty.
 - After dark, prefer well-lit, populated routes; say so in the reason.
 - Severe weather (storms, heat advisories) suppresses outdoor quests.
 - Distances assume walking; never route across highways or water without a
-  marked crossing. The app shows straight-line distance — the skill must not
+  marked crossing. The app shows straight-line distance. The skill must not
   imply a verified route.
 
 ## Example
 
 > Context: 18:12, clear, user 120 km from home, loves viewpoints.
-> Output: `Sunset Bluff Viewpoint` — "golden hour light · worth it while you
-> are here". Travel-mode suggestion suppressed (already traveling-tuned).
+> Output: `Sunset Bluff Viewpoint`. Reason: "golden hour light, worth it
+> while you are here". Travel-mode suggestion suppressed (already tuned
+> for travel).
 
 ## Versioning
 

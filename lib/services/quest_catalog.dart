@@ -1,6 +1,6 @@
 import 'package:sidequests/models/quest.dart';
 
-/// Stub quest catalog. Every [kAllInterests] entry matches at least one quest.
+/// Stub quest catalog. Every kAllInterests entry matches at least one quest.
 /// Live Muse + places/events feeds replace this list; the shape stays.
 const questCatalog = <Quest>[
   Quest(
@@ -33,7 +33,7 @@ const questCatalog = <Quest>[
     minutes: 90,
     meters: 1500,
     tags: ['food markets', 'evenings', 'social'],
-    why: 'The dumpling stall closes when it sells out — usually by nine.',
+    why: 'The dumpling stall closes when it sells out, usually by nine.',
     bestWindow: 'Fri–Sun evenings',
   ),
   Quest(
@@ -88,7 +88,7 @@ const questCatalog = <Quest>[
     minutes: 25,
     meters: 1100,
     tags: ['street art', 'outdoors', 'local gems'],
-    why: 'The big wall gets painted over every month — see this one now.',
+    why: 'The big wall gets painted over every month. See this one now.',
     bestWindow: 'Daylight',
   ),
   Quest(

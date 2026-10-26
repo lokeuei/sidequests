@@ -50,7 +50,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         const SizedBox(height: 6),
         Text(
           'Muse learns from your taps, saves, and strolls. '
-          'Tell it more to sharpen the magic.',
+          'The more you tell it, the better its picks.',
           style: text.bodyMedium,
         ).enter(context, delayMs: 60),
         const SizedBox(height: 18),
@@ -138,7 +138,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
         SwitchListTile(
           title: const Text('Audio cues'),
-          subtitle: const Text('Spoken nudges — notification sound for now.'),
+          subtitle: const Text('Spoken nudges. For now, the notification sound.'),
           value: profile.audioCues,
           onChanged: (value) => profiles.update((p) => p.audioCues = value),
         ),
@@ -158,19 +158,19 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         const SizedBox(height: 20),
         const SectionHeader(title: 'How learning works'),
         const SizedBox(height: 8),
-        _learnRow(context, Icons.favorite_border, 'Save what you love — Muse notices.'),
-        _learnRow(context, Icons.close, 'Dismiss what you don’t — it adapts.'),
+        _learnRow(context, Icons.favorite_border, 'Save what you love. Muse notices.'),
+        _learnRow(context, Icons.close, "Dismiss what you don't. It adapts."),
         _learnRow(
           context,
           Icons.directions_walk,
-          'Press “Let’s go” — it learns fastest.',
+          'Press "Let\'s go". It learns fastest.',
         ),
         const SizedBox(height: 20),
         SectionHeader(title: 'Saved', note: '${saved.length}'),
         const SizedBox(height: 8),
         if (saved.isEmpty)
           Text(
-            'Nothing saved yet — tap the heart on anything you like.',
+            'Nothing saved yet. Tap the heart on anything you like.',
             style: text.bodyMedium,
           )
         else

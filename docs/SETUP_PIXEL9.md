@@ -1,4 +1,4 @@
-# Pixel 9 setup — Sidequests (Flutter)
+# Sidequests setup for Pixel 9
 
 Target: Google Pixel 9 (Android 14/15) via USB or Wi-Fi debugging.
 Time: ~30–60 min first install, ~2 min after that.
@@ -55,7 +55,7 @@ flutter create --platforms=android,ios .  # fills icons, Gradle wrapper, iOS she
 flutter pub get
 ```
 
-(`flutter create .` only adds missing/generated platform files — it keeps `lib/`.)
+(`flutter create .` only adds missing/generated platform files. It keeps `lib/`.)
 
 ## 5. Run on the Pixel 9
 
@@ -65,8 +65,8 @@ flutter run         # pick the Pixel 9; first build takes a few minutes
 ```
 
 On first launch, grant **location** (for nearby ranking + travel detection)
-and **notifications** (for nudges) when asked. Denying either is fine — the
-app falls back to stub context and in-app-only suggestions.
+and **notifications** (for nudges) when asked. Denying either is fine.
+The app falls back to stub context and in-app-only suggestions.
 
 Useful during dev:
 
@@ -89,10 +89,10 @@ adb install build\app\outputs\flutter-apk\app-release.apk
 
 | Symptom | Fix |
 |---|---|
-| `flutter.sdk not set in local.properties` | Run `flutter pub get` once — the tool writes it. |
+| `flutter.sdk not set in local.properties` | Run `flutter pub get` once. The tool writes it. |
 | Gradle download stalls | Check proxy/VPN; retry `flutter run -v`. |
 | `compileSdk 34` / build-tools missing | `sdkmanager "platforms;android-34" "build-tools;34.0.0"` |
 | JDK errors in Gradle | Keep JDK 17–21; this repo compiles against Java 17 bytecode. |
 | Location always "Your neighborhood" | Grant location permission; enable Location Services on the phone. |
 | No notification | Grant notification permission; check Do Not Disturb / channel "Adventure nudges". |
-| Fonts look off in tests | Tests set `allowRuntimeFetching = false` — expected, uses fallback fonts. |
+| Fonts look off in tests | Tests set `allowRuntimeFetching = false`. That is expected; tests use fallback fonts. |

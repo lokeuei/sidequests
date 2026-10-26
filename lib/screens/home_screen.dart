@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Nudge sent — check your notifications.'),
+                  content: Text('Nudge sent. Check your notifications.'),
                 ),
               );
             },
@@ -217,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Travel mode is on — leaning into local gems.',
+              'Travel mode is on. Showing local gems first.',
               style: text.bodyMedium,
             ),
           ),
@@ -236,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Text('All caught up.', style: text.titleLarge),
           const SizedBox(height: 8),
           Text(
-            'Enjoy the quiet — or reshuffle the deck.',
+            'Enjoy the quiet, or reshuffle the deck.',
             style: text.bodyMedium,
           ),
           const SizedBox(height: 16),

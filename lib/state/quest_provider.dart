@@ -86,23 +86,24 @@ class QuestProvider extends ChangeNotifier {
 
   String _describe(QuestContext context, UserProfile profile) {
     final parts = <String>[];
-    if (context.traveling) parts.add('Away from home');
+    if (context.traveling) parts.add('away from home');
     if (context.isGoldenHour) {
-      parts.add('Golden-hour light');
+      parts.add('golden-hour light');
     } else if (context.isMorning) {
-      parts.add('Fresh morning');
+      parts.add('fresh morning');
     } else if (context.isNight) {
-      parts.add('Night is falling');
+      parts.add('night is falling');
     }
     if (context.isRainy) {
-      parts.add('Rain outside');
+      parts.add('rain outside');
     } else if (context.isClear) {
-      parts.add('Clear skies');
+      parts.add('clear skies');
     }
     if (profile.interests.isNotEmpty) {
-      parts.add('You love ${profile.interests.take(2).join(' and ')}');
+      parts.add('you love ${profile.interests.take(2).join(' and ')}');
     }
     if (parts.isEmpty) return 'A few ideas worth looking up for.';
-    return '${parts.join(' · ')} — a few ideas worth looking up for.';
+    final lead = parts.join(', ');
+    return '${lead[0].toUpperCase()}${lead.substring(1)}. A few ideas worth looking up for.';
   }
 }

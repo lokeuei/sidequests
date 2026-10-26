@@ -86,7 +86,7 @@ class QuestDetailScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Live maps plug in here — for now, follow your feet.',
+                    'Live maps plug in here. For now, follow your feet.',
                     style: text.bodyMedium,
                   ),
                 ),

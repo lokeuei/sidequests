@@ -1,28 +1,28 @@
-# Sidequests — Less scrolling. More living.
+# Sidequests: less scrolling, more living
 
 We spend too much time staring at our phones, missing the interesting things
 happening right around us. Sidequests flips that: it learns what you love,
 watches your location, the weather, and the time of day, then nudges you
-toward little adventures worth putting the phone down for — a sunset viewpoint,
-a historic facade you've walked past a hundred times, a night market you never
-knew existed.
+toward little adventures worth putting the phone down for. A sunset viewpoint.
+A historic facade you have walked past a hundred times. A night market you
+never knew existed.
 
 AI that reconnects you with the real world instead of pulling you away from it.
 
 ## What v1 does (Pixel 9 / Android)
 
-- **Explore tab** — a short, ranked list of quests "right now", with a
-  plain-language reason for each ("golden hour light · you love viewpoints").
-- **Automatic context** — device location (with permission), keyless weather
+- **Explore tab**: a short, ranked list of quests "right now", with a
+  plain-language reason for each ("golden hour light, made for tonight").
+- **Automatic context**: device location (with permission), keyless weather
   from Open-Meteo, time of day, and travel detection. No weather API key needed.
-- **Nudges** — local notifications for the top quest; a louder style when
+- **Nudges**: local notifications for the top quest; a louder style when
   "Bold" is on. Audio cues ride on the notification sound for now.
-- **You tab** — name, interests ("love" / "less of"), nudge style, travel mode,
+- **You tab**: name, interests ("love" / "less of"), nudge style, travel mode,
   saved quests, and a reset. By default Muse learns from taps, saves,
-  dismissals, and "Let's go" presses — explicit settings just sharpen it.
-- **Travel mode** — when you're >80 km from home (or toggle it manually),
+  dismissals, and "Let's go" presses. Explicit settings improve its picks.
+- **Travel mode**: when you're >80 km from home (or toggle it manually),
   rankings lean into local gems. Muse can suggest turning it on.
-- **Muse skill spec** — `muse-skill/` defines the ongoing-skill contract so the
+- **Muse skill spec**: `muse-skill/` defines the ongoing-skill contract so the
   stub engine can be swapped for live Muse reasoning without touching the UI.
 
 ## Quickstart
@@ -65,7 +65,7 @@ muse-skill/                 Ongoing-skill contract for Muse (triggers, signals,
                             quest JSON, learning deltas, safety)
 ```
 
-The UI never talks to Muse directly — it talks to `rankQuests()`. When the
+The UI never talks to Muse directly. It talks to `rankQuests()`. When the
 live skill lands, only `suggestion_engine.dart` (and its tests) change.
 
 ## Design notes
@@ -73,7 +73,7 @@ live skill lands, only `suggestion_engine.dart` (and its tests) change.
 - Warm paper + deep pine + persimmon; Fraunces display serif with Outfit body.
 - Cards enter with a staggered rise-and-fade; detail opens with a soft
   fade-and-settle. All motion yields to the OS reduced-motion setting.
-- Radii, shapes, and headers vary on purpose — no template-grid look.
+- Radii, shapes, and headers vary on purpose. No template-grid look.
 
 ## Roadmap
 
@@ -85,4 +85,4 @@ live skill lands, only `suggestion_engine.dart` (and its tests) change.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE).

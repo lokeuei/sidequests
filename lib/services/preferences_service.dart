@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidequests/models/user_profile.dart';
 
 /// Persists the profile. [PreferencesService.memory] is the in-memory
-/// variant for tests — no platform channels involved.
+/// variant for tests, with no platform channels involved.
 class PreferencesService {
   PreferencesService.device() : _memory = null;
   PreferencesService.memory() : _memory = <String, Object?>{};

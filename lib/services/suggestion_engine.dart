@@ -23,7 +23,7 @@ const kAllInterests = <String>[
 ];
 
 /// Automatic context the ranker (and later, the Muse skill) reasons over.
-/// Pure Dart — no Flutter imports, so this file is unit-testable.
+/// Pure Dart with no Flutter imports, so this file is unit-testable.
 class QuestContext {
   const QuestContext({
     required this.hour,
@@ -80,8 +80,8 @@ class _Note {
 
 /// Stub "Muse" reasoning: scores candidates from profile + automatic context.
 ///
-/// The live Muse skill replaces this function behind the same signature —
-/// see `muse-skill/SKILL.md`. Contributors double as the user-facing
+/// The live Muse skill replaces this function behind the same signature.
+/// See `muse-skill/SKILL.md`. Contributors double as the user-facing
 /// "why this now" reason.
 List<ScoredQuest> rankQuests({
   required List<Quest> candidates,
@@ -125,7 +125,7 @@ List<ScoredQuest> rankQuests({
     }
     if (context.isMorning &&
         tags.intersection({'mornings', 'cafes', 'quiet', 'bakery'}).isNotEmpty) {
-      add(10, 'good morning energy');
+      add(10, 'made for the morning');
     }
     if (context.isNight &&
         tags.intersection({'night', 'stargazing', 'live music', 'night walks'}).isNotEmpty) {
@@ -166,7 +166,7 @@ List<ScoredQuest> rankQuests({
       ..sort((a, b) => b.points.compareTo(a.points));
     final reason = positive.isEmpty
         ? quest.why
-        : positive.take(2).map((n) => n.label).join(' · ');
+        : positive.take(2).map((n) => n.label).join(', ');
     scored.add(ScoredQuest(quest: quest, score: score, reason: reason));
   }
   scored.sort((a, b) => b.score.compareTo(a.score));

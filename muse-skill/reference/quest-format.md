@@ -1,7 +1,7 @@
 # Quest JSON format (skill ↔ app contract)
 
 The skill returns quests in this shape. The Flutter `Quest` model mirrors it
-1:1 — keep them in sync.
+1:1. Keep them in sync.
 
 ## Schema
 
@@ -26,14 +26,14 @@ Ranked response envelope:
 ```jsonc
 {
   "quests": [
-    { "<quest...>": null, "score": 99.6, "reason": "golden hour light · you love viewpoints" }
+    { "<quest...>": null, "score": 99.6, "reason": "golden hour light, you love viewpoints" }
   ],
-  "reasoning": "Away from home · Golden-hour light — a few ideas worth looking up for."
+  "reasoning": "Away from home, golden-hour light. A few ideas worth looking up for."
 }
 ```
 
-- `score`: number, for ordering only — never shown to the user.
-- `reason`: top two positive contributors joined with ` · `, or `why`.
+- `score`: number, for ordering only. Never shown to the user.
+- `reason`: top two positive contributors joined with a comma, or `why`.
 - `reasoning`: one line for the Explore header, same fragment style.
 
 ## Example
@@ -59,5 +59,5 @@ Ranked response envelope:
 - Tags MUST come from the skill interest vocabulary (plus `outdoors`,
   `night`, `evenings`, `mornings`, `bakery`, `bookshops`, `day trips`
   as modifier tags).
-- No emoji anywhere. No purple-prose blurbs — one concrete image each.
+- No emoji anywhere. No purple-prose blurbs. Each one should carry a single concrete image.
 - `meters` is straight-line; never present it as a routed distance.

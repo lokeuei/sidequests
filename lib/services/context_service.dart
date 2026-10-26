@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 /// Automatic signals: where the user is, what the sky is doing.
 ///
-/// Everything degrades to a stub — the app never blocks on sensors.
+/// Everything degrades to a stub. The app never blocks on sensors.
 class DeviceContext {
   const DeviceContext({
     this.latitude,
