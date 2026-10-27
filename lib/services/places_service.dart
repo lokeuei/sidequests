@@ -10,14 +10,13 @@ import 'package:sidequests/models/quest.dart';
 
 /// Real nearby places from OpenStreetMap via the Overpass API. Keyless.
 class PlacesService {
-  /// Public Overpass instances, raced in parallel. Single instances flap
-  /// often enough that racing beats sequential failover.
+  /// Overpass instances that answer. Raced in parallel, first non-empty
+  /// wins. overpass-api.de and overpass.nchc.org.tw were dropped after
+  /// repeated phone failures (unreachable host, dead DNS).
   static const _endpoints = [
-    'https://overpass-api.de/api/interpreter',
+    'https://overpass.openstreetmap.fr/api/interpreter',
     'https://overpass.kumi.systems/api/interpreter',
     'https://overpass.private.coffee/api/interpreter',
-    'https://overpass.openstreetmap.fr/api/interpreter',
-    'https://overpass.nchc.org.tw/api/interpreter',
   ];
 
   Future<PlacesOutcome> nearby(
@@ -42,8 +41,10 @@ out center 30;
       var answered = false;
       for (final endpoint in _endpoints) {
         _tryEndpoint(httpClient, endpoint, query, latitude, longitude).then(
-          (quests) {
+          (attempt) {
             if (done.isCompleted) return;
+            if (attempt.log != null) print(attempt.log);
+            final quests = attempt.quests;
             if (quests != null && quests.isNotEmpty) {
               done.complete(
                 PlacesOutcome(quests: quests, failed: false),
@@ -66,9 +67,9 @@ out center 30;
     }
   }
 
-  /// Null when the endpoint failed; possibly empty when it answered.
+  /// Null quests when the endpoint failed; possibly empty when it answered.
   /// Overpass wants POSTed queries and an honest User-Agent, so both.
-  Future<List<Quest>?> _tryEndpoint(
+  Future<_Attempt> _tryEndpoint(
     http.Client client,
     String endpoint,
     String query,
@@ -88,19 +89,27 @@ out center 30;
           )
           .timeout(const Duration(seconds: 15));
       if (response.statusCode != 200) {
-        print('places: $host said ${response.statusCode}');
-        return null;
+        return _Attempt(null, 'places: $host said ${response.statusCode}');
       }
       final quests = parseOverpass(response.body, latitude, longitude);
       if (quests.isNotEmpty) {
-        print('places: $host won with ${quests.length} in ${stopwatch.elapsedMilliseconds}ms');
+        return _Attempt(
+          quests,
+          'places: $host won with ${quests.length} in ${stopwatch.elapsedMilliseconds}ms',
+        );
       }
-      return quests;
+      return _Attempt(quests, null);
     } catch (e) {
-      print('places: $host failed ($e)');
-      return null;
+      return _Attempt(null, 'places: $host failed ($e)');
     }
   }
+}
+
+class _Attempt {
+  const _Attempt(this.quests, this.log);
+
+  final List<Quest>? quests;
+  final String? log;
 }
 
 class PlacesOutcome {
@@ -215,8 +224,8 @@ class _Kind {
   const _Kind(this.category, this.tags, this.blurb, this.why, this.bestWindow);
 
   final QuestCategory category;
-  final String blurb;
   final List<String> tags;
+  final String blurb;
   final String why;
   final String bestWindow;
 }

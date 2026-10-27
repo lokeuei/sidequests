@@ -36,6 +36,7 @@ class _RecordingPlaces extends PlacesService {
 class _RecordingEvents extends EventsService {
   double? seenLat;
   double? seenLon;
+  List<Quest> items = [];
 
   @override
   Future<List<Quest>> upcoming(
@@ -46,7 +47,7 @@ class _RecordingEvents extends EventsService {
   }) async {
     seenLat = latitude;
     seenLon = longitude;
-    return [];
+    return items;
   }
 }
 
@@ -58,6 +59,18 @@ QuestProvider _provider(_RecordingPlaces places, _RecordingEvents events) {
     events: events,
   );
 }
+
+const _gig = Quest(
+  id: 'tm-9',
+  title: 'Riverside Gig',
+  blurb: 'Pier Hall. Tickets still listed.',
+  category: QuestCategory.social,
+  minutes: 120,
+  meters: 500,
+  tags: ['events', 'live music', 'social'],
+  why: 'On Saturday.',
+  bestWindow: 'Saturday',
+);
 
 void main() {
   test('refresh searches the dropped point when set', () async {
@@ -83,5 +96,22 @@ void main() {
     expect(places.seenLat, 47.6);
     expect(places.seenLon, -122.3);
     expect(quests.searchingElsewhere, isFalse);
+  });
+
+  test('gigs light the gigs flag', () async {
+    final places = _RecordingPlaces();
+    final events = _RecordingEvents()..items = [_gig];
+    final quests = _provider(places, events);
+    await quests.refresh(UserProfile(), autoNudge: false);
+    expect(quests.liveGigs, isTrue);
+    expect(quests.livePlaces, isTrue);
+  });
+
+  test('no gigs leaves the gigs flag off', () async {
+    final places = _RecordingPlaces();
+    final events = _RecordingEvents();
+    final quests = _provider(places, events);
+    await quests.refresh(UserProfile(), autoNudge: false);
+    expect(quests.liveGigs, isFalse);
   });
 }

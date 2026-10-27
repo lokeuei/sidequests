@@ -94,4 +94,25 @@ void main() {
     expect(quests.length, 1);
     expect(quests.first.title, 'Riverside Gig');
   });
+
+  test('event lookup asks for nearby gigs from now on', () async {
+    Uri? seenUri;
+    final client = MockClient((request) async {
+      seenUri = request.url;
+      return http.Response('{"_embedded": {"events": []}}', 200);
+    });
+    await EventsService()
+        .upcoming(47.6, -122.3, apiKey: 'tm-key', client: client);
+    final params = seenUri!.queryParameters;
+    expect(seenUri!.host, 'app.ticketmaster.com');
+    expect(params['latlong'], '47.6,-122.3');
+    expect(params['radius'], '25');
+    expect(params['unit'], 'km');
+    expect(params['size'], '20');
+    expect(params['sort'], 'date,asc');
+    expect(
+      params['startDateTime'],
+      matches(RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$')),
+    );
+  });
 }

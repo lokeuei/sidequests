@@ -32,6 +32,7 @@ class QuestProvider extends ChangeNotifier {
   String reasoning = '';
   bool loading = false;
   bool livePlaces = false;
+  bool liveGigs = false;
   bool museUsed = false;
 
   /// True once a refresh finished (even an empty one). The UI only shows
@@ -58,7 +59,35 @@ class QuestProvider extends ChangeNotifier {
     loading = true;
     notifyListeners();
     try {
-      device = await contextService.current();
+      // Around a search point the coords are already known, so context,
+      // places, and gigs all load at once. On GPS the context (and its
+      // coords) has to come first.
+      PlacesOutcome? found;
+      var gigs = <Quest>[];
+      final sLat = searchLat;
+      final sLon = searchLon;
+      if (sLat != null && sLon != null) {
+        final (dev, f, g) = await (
+          contextService.current(),
+          places.nearby(sLat, sLon),
+          events.upcoming(sLat, sLon, apiKey: profile.ticketmasterKey),
+        ).wait;
+        device = dev;
+        found = f;
+        gigs = g;
+      } else {
+        device = await contextService.current();
+        final lat = device.latitude;
+        final lon = device.longitude;
+        if (lat != null && lon != null) {
+          final (f, g) = await (
+            places.nearby(lat, lon),
+            events.upcoming(lat, lon, apiKey: profile.ticketmasterKey),
+          ).wait;
+          found = f;
+          gigs = g;
+        }
+      }
       final now = DateTime.now();
       final context = QuestContext(
         hour: now.hour,
@@ -72,14 +101,9 @@ class QuestProvider extends ChangeNotifier {
       lastContext = context;
       var candidates = <Quest>[];
       livePlaces = false;
+      liveGigs = gigs.isNotEmpty;
       placesFailed = false;
-      final lat = searchLat ?? device.latitude;
-      final lon = searchLon ?? device.longitude;
-      if (lat != null && lon != null) {
-        final (found, gigs) = await (
-          places.nearby(lat, lon),
-          events.upcoming(lat, lon, apiKey: profile.ticketmasterKey),
-        ).wait;
+      if (found != null) {
         placesFailed = found.failed;
         final live = [...found.quests, ...gigs];
         if (live.isNotEmpty) {

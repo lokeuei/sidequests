@@ -1,3 +1,6 @@
+// ignore_for_file: avoid_print
+// One-line outcomes print to the dev console so event failures
+// (bad key, bad status) can be diagnosed from `flutter run` output.
 import 'dart:convert';
 import 'dart:math';
 
@@ -21,18 +24,30 @@ class EventsService {
         : (apiKey != null && apiKey.trim().isNotEmpty ? apiKey.trim() : '');
     if (key.isEmpty) return [];
     final httpClient = client ?? http.Client();
+    final stopwatch = Stopwatch()..start();
     try {
-      final now = DateTime.now().toUtc().toIso8601String();
+      // Ticketmaster wants seconds, no millis: 2026-10-27T03:30:00Z.
+      final stamp =
+          '${DateTime.now().toUtc().toIso8601String().substring(0, 19)}Z';
       final uri = Uri.parse(
         'https://app.ticketmaster.com/discovery/v2/events.json'
         '?apikey=$key&latlong=$latitude,$longitude&radius=25&unit=km'
-        '&size=20&sort=date,asc&startDateTime=$now',
+        '&size=20&sort=date,asc&startDateTime=$stamp',
       );
       final response =
           await httpClient.get(uri).timeout(const Duration(seconds: 15));
-      if (response.statusCode != 200) return [];
-      return parseTicketmaster(response.body, DateTime.now(), latitude, longitude);
-    } catch (_) {
+      if (response.statusCode != 200) {
+        print('events: said ${response.statusCode}');
+        return [];
+      }
+      final quests =
+          parseTicketmaster(response.body, DateTime.now(), latitude, longitude);
+      if (quests.isNotEmpty) {
+        print('events: found ${quests.length} in ${stopwatch.elapsedMilliseconds}ms');
+      }
+      return quests;
+    } catch (e) {
+      print('events: failed ($e)');
       return [];
     } finally {
       if (client == null) httpClient.close();
