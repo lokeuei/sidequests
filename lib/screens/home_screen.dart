@@ -232,10 +232,12 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
         children: [
-          if (quests.loading && quests.hasLoaded) ...[
-            const LinearProgressIndicator(),
-            const SizedBox(height: 8),
-          ],
+          SizedBox(
+            height: 12,
+            child: quests.loading && quests.hasLoaded
+                ? const LinearProgressIndicator()
+                : const SizedBox.shrink(),
+          ),
           Text(
             _dateLine(now),
             style: text.bodySmall?.copyWith(
