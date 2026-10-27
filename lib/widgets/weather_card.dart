@@ -64,6 +64,19 @@ class WeatherCard extends StatelessWidget {
               ),
             ],
           ),
+          if (weather.sunrise.isNotEmpty && weather.sunset.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(Icons.wb_twilight, size: 16, color: scheme.secondary),
+                const SizedBox(width: 6),
+                Text(
+                  'Sunrise ${timeLabel(weather.sunrise)} · Sunset ${timeLabel(weather.sunset)}',
+                  style: text.bodySmall,
+                ),
+              ],
+            ),
+          ],
           if (weather.hourly.isNotEmpty) ...[
             const SizedBox(height: 16),
             SizedBox(

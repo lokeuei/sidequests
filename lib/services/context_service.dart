@@ -56,10 +56,15 @@ class ContextService {
         );
         traveling = meters > 80000;
       }
+      final placeLabel = await _placeName(
+        position.latitude,
+        position.longitude,
+        traveling ? 'Somewhere new' : 'Nearby',
+      );
       return DeviceContext(
         latitude: position.latitude,
         longitude: position.longitude,
-        placeLabel: traveling ? 'Somewhere new' : 'Nearby',
+        placeLabel: placeLabel,
         temperatureC: weather?.temperatureC,
         weatherCode: weather?.code ?? -1,
         weather: weather,
@@ -102,7 +107,7 @@ class ContextService {
         '?latitude=$latitude&longitude=$longitude'
         '&current=temperature_2m,weather_code'
         '&hourly=temperature_2m,weather_code'
-        '&daily=weather_code,temperature_2m_max,temperature_2m_min'
+        '&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset'
         '&forecast_days=5&timezone=auto',
       );
       final response = await http.get(uri).timeout(const Duration(seconds: 8));
@@ -116,6 +121,9 @@ class ContextService {
 
       final hourly = _parseHourly(body['hourly']);
       final daily = _parseDaily(body['daily']);
+      final dailyRaw = body['daily'] as Map<String, dynamic>?;
+      final sunrises = (dailyRaw?['sunrise'] as List?) ?? [];
+      final sunsets = (dailyRaw?['sunset'] as List?) ?? [];
       return WeatherInfo(
         temperatureC: temp,
         code: code,
@@ -123,6 +131,8 @@ class ContextService {
         lowC: daily.isNotEmpty ? daily.first.minC : temp,
         hourly: hourly,
         daily: daily,
+        sunrise: sunrises.isNotEmpty ? sunrises.first.toString() : '',
+        sunset: sunsets.isNotEmpty ? sunsets.first.toString() : '',
       );
     } catch (_) {
       return null;
@@ -180,6 +190,26 @@ class ContextService {
       return points;
     } catch (_) {
       return [];
+    }
+  }
+
+  /// Keyless neighborhood name from BigDataCloud. Falls back cleanly.
+  Future<String> _placeName(double latitude, double longitude, String fallback) async {
+    try {
+      final uri = Uri.parse(
+        'https://api.bigdatacloud.net/data/reverse-geocode-client'
+        '?latitude=$latitude&longitude=$longitude&localityLanguage=en',
+      );
+      final response = await http.get(uri).timeout(const Duration(seconds: 8));
+      if (response.statusCode != 200) return fallback;
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      for (final key in ['locality', 'city', 'principalSubdivision']) {
+        final value = (body[key] ?? '').toString().trim();
+        if (value.isNotEmpty) return value;
+      }
+      return fallback;
+    } catch (_) {
+      return fallback;
     }
   }
 }

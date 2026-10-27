@@ -7,6 +7,8 @@ class WeatherInfo {
     required this.lowC,
     required this.hourly,
     required this.daily,
+    this.sunrise = '',
+    this.sunset = '',
   });
 
   final double temperatureC;
@@ -15,6 +17,10 @@ class WeatherInfo {
   final double lowC;
   final List<HourlyPoint> hourly;
   final List<DailyPoint> daily;
+
+  /// Local ISO datetimes, e.g. 2026-10-27T06:30. Empty when unknown.
+  final String sunrise;
+  final String sunset;
 
   /// Offline sample built around right now. Used when sensors are off.
   factory WeatherInfo.sample() {
@@ -38,6 +44,7 @@ class WeatherInfo {
         code: i == 2 ? 3 : 1,
       ));
     }
+    final today = _isoHour(now).substring(0, 10);
     return WeatherInfo(
       temperatureC: 19,
       code: 1,
@@ -45,6 +52,8 @@ class WeatherInfo {
       lowC: 14,
       hourly: hourly,
       daily: daily,
+      sunrise: '${today}T06:30',
+      sunset: '${today}T19:45',
     );
   }
 
@@ -108,6 +117,18 @@ String hourLabel(String timeIso) {
   if (hour == 12) return '12 PM';
   if (hour < 12) return '$hour AM';
   return '${hour - 12} PM';
+}
+
+/// Turns 2026-10-27T06:42 into 6:42 AM. Falls back to '' on bad input.
+String timeLabel(String timeIso) {
+  if (timeIso.length < 16) return '';
+  final hour = int.tryParse(timeIso.substring(11, 13));
+  final minute = timeIso.substring(14, 16);
+  if (hour == null || int.tryParse(minute) == null) return '';
+  if (hour == 0) return '12:$minute AM';
+  if (hour == 12) return '12:$minute PM';
+  if (hour < 12) return '$hour:$minute AM';
+  return '${hour - 12}:$minute PM';
 }
 
 /// Turns 2026-10-28 into Tue. Falls back to '' on bad input.

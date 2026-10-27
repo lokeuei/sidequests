@@ -20,6 +20,8 @@ AI that reconnects you with the real world instead of pulling you away from it.
 - **Painted cover art**: every quest gets in-code cover art, no downloads.
 - **Maps + weather**: OpenStreetMap pins around you (no API key) and a classic
   weather block with hourly and daily rows.
+- **Live places**: real nearby spots from OpenStreetMap when online, samples
+  when not. The list header tells you which.
 - **You tab**: name, interests ("love" / "less of"), nudge style, travel mode,
   saved quests, and a reset. By default Muse learns from taps, saves,
   dismissals, and "Let's go" presses. Explicit settings improve its picks.

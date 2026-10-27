@@ -2,21 +2,29 @@ import 'package:flutter/foundation.dart';
 import 'package:sidequests/models/user_profile.dart';
 import 'package:sidequests/services/context_service.dart';
 import 'package:sidequests/services/notification_service.dart';
+import 'package:sidequests/services/places_service.dart';
 import 'package:sidequests/services/quest_catalog.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 
 /// Ranked quests for "right now", plus the reasoning line the UI shows.
+/// Uses live nearby places when online, samples when not.
 class QuestProvider extends ChangeNotifier {
-  QuestProvider({required this.contextService, required this.notifications});
+  QuestProvider({
+    required this.contextService,
+    required this.notifications,
+    PlacesService? places,
+  }) : places = places ?? PlacesService();
 
   final ContextService contextService;
   final NotificationService notifications;
+  final PlacesService places;
 
   List<ScoredQuest> quests = [];
   DeviceContext device = const DeviceContext();
   QuestContext? lastContext;
   String reasoning = '';
   bool loading = false;
+  bool livePlaces = false;
   bool _autoNudged = false;
   final List<String> _dismissed = [];
 
@@ -34,8 +42,20 @@ class QuestProvider extends ChangeNotifier {
         traveling: device.traveling || profile.travelMode,
       );
       lastContext = context;
+      var candidates = questCatalog;
+      livePlaces = false;
+      if (device.latitude != null && device.longitude != null) {
+        final found = await places.nearby(
+          device.latitude!,
+          device.longitude!,
+        );
+        if (found.length >= 3) {
+          candidates = found;
+          livePlaces = true;
+        }
+      }
       quests = rankQuests(
-        candidates: questCatalog,
+        candidates: candidates,
         profile: profile,
         context: context,
       ).where((q) => !_dismissed.contains(q.quest.id)).toList();

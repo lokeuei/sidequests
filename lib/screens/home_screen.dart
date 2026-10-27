@@ -195,7 +195,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ).enter(context, delayMs: 220),
           ],
           const SizedBox(height: 20),
-          SectionHeader(title: 'Right now', note: '${quests.quests.length} ideas')
+          SectionHeader(
+            title: 'Right now',
+            note:
+                '${quests.quests.length} ideas · ${quests.livePlaces ? 'live' : 'samples'}',
+          )
               .enter(context, delayMs: 240),
           const SizedBox(height: 12),
           if (quests.quests.isEmpty)
