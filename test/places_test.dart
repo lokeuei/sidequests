@@ -50,7 +50,11 @@ void main() {
   });
 
   test('first answering endpoint wins the race', () async {
+    String? seenMethod;
+    String? seenAgent;
     final client = MockClient((request) async {
+      seenMethod = request.method;
+      seenAgent = request.headers['User-Agent'];
       if (request.url.host == 'overpass-api.de') {
         return http.Response('busy', 429);
       }
@@ -59,6 +63,8 @@ void main() {
     final outcome = await PlacesService().nearby(59.9, 10.7, client: client);
     expect(outcome.failed, isFalse);
     expect(outcome.quests.length, 2);
+    expect(seenMethod, 'POST');
+    expect(seenAgent, contains('Sidequests'));
   });
 
   test('all endpoints failing is reported, not silent', () async {

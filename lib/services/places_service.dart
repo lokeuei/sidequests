@@ -13,6 +13,8 @@ class PlacesService {
     'https://overpass-api.de/api/interpreter',
     'https://overpass.kumi.systems/api/interpreter',
     'https://overpass.private.coffee/api/interpreter',
+    'https://overpass.openstreetmap.fr/api/interpreter',
+    'https://overpass.nchc.org.tw/api/interpreter',
   ];
 
   Future<PlacesOutcome> nearby(
@@ -62,6 +64,7 @@ out center 30;
   }
 
   /// Null when the endpoint failed; possibly empty when it answered.
+  /// Overpass wants POSTed queries and an honest User-Agent, so both.
   Future<List<Quest>?> _tryEndpoint(
     http.Client client,
     String endpoint,
@@ -69,15 +72,29 @@ out center 30;
     double latitude,
     double longitude,
   ) async {
+    final host = Uri.parse(endpoint).host;
+    final stopwatch = Stopwatch()..start();
     try {
-      final uri = Uri.parse(
-        '$endpoint?data=${Uri.encodeQueryComponent(query)}',
-      );
-      final response =
-          await client.get(uri).timeout(const Duration(seconds: 12));
-      if (response.statusCode != 200) return null;
-      return parseOverpass(response.body, latitude, longitude);
-    } catch (_) {
+      final response = await client
+          .post(
+            Uri.parse(endpoint),
+            headers: {
+              'User-Agent': 'Sidequests/1.0 (+https://github.com/lokeuei/sidequests)',
+            },
+            body: {'data': query},
+          )
+          .timeout(const Duration(seconds: 15));
+      if (response.statusCode != 200) {
+        print('places: $host said ${response.statusCode}');
+        return null;
+      }
+      final quests = parseOverpass(response.body, latitude, longitude);
+      if (quests.isNotEmpty) {
+        print('places: $host won with ${quests.length} in ${stopwatch.elapsedMilliseconds}ms');
+      }
+      return quests;
+    } catch (e) {
+      print('places: $host failed ($e)');
       return null;
     }
   }
@@ -195,8 +212,8 @@ class _Kind {
   const _Kind(this.category, this.tags, this.blurb, this.why, this.bestWindow);
 
   final QuestCategory category;
-  final List<String> tags;
   final String blurb;
+  final List<String> tags;
   final String why;
   final String bestWindow;
 }
