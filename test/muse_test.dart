@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sidequests/models/user_profile.dart';
 import 'package:sidequests/models/weather.dart';
@@ -5,11 +7,17 @@ import 'package:sidequests/services/muse_brain.dart';
 
 import 'fixtures/sample_quests.dart';
 
-const _reply = '''
-{"choices": [{"message": {"content":
-"{\\"picks\\": [{\\"id\\": \\"q-small-museum\\", \\"reason\\": \\"Rain is coming, go inside.\\"},{\\"id\\": \\"q-nope\\", \\"reason\\": \\"Made up.\\"}],
-\\"reasoning\\": \\"Rain outside, you love museums\\"}"}}]}
-''';
+String museReply({required List<Map<String, String>> picks, required String reasoning}) {
+  return jsonEncode({
+    'choices': [
+      {
+        'message': {
+          'content': jsonEncode({'picks': picks, 'reasoning': reasoning}),
+        },
+      },
+    ],
+  });
+}
 
 void main() {
   test('prompt carries date, weather, prefs, and candidates', () {
@@ -41,7 +49,14 @@ void main() {
   });
 
   test('parser maps picks, drops unknown ids', () {
-    final suggestion = parseMuseResponse(_reply, questCatalog);
+    final reply = museReply(
+      picks: [
+        {'id': 'q-small-museum', 'reason': 'Rain is coming, go inside.'},
+        {'id': 'q-nope', 'reason': 'Made up.'},
+      ],
+      reasoning: 'Rain outside, you love museums',
+    );
+    final suggestion = parseMuseResponse(reply, questCatalog);
     expect(suggestion, isNotNull);
     expect(suggestion!.picks.length, 1);
     expect(suggestion.picks.first.quest.id, 'q-small-museum');
@@ -54,7 +69,7 @@ void main() {
     expect(parseMuseResponse('{"choices": []}', questCatalog), isNull);
     expect(
       parseMuseResponse(
-        '{"choices": [{"message": {"content": "{\\"picks\\": []}"}}]}',
+        museReply(picks: [], reasoning: ''),
         questCatalog,
       ),
       isNull,
