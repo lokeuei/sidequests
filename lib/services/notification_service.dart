@@ -1,7 +1,9 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:sidequests/models/quest.dart';
 
-/// The "little nudge to look up": a local notification for the top quest.
+/// The "little nudge to look up": a local notification for the top quest,
+/// plus optional spoken cues through the system voice.
 /// [NotificationService.memory] is a no-op for tests.
 class NotificationService {
   NotificationService.device() : _memory = false;
@@ -9,6 +11,7 @@ class NotificationService {
 
   final bool _memory;
   FlutterLocalNotificationsPlugin? _plugin;
+  FlutterTts? _tts;
   bool _ready = false;
 
   Future<void> init() async {
@@ -28,11 +31,18 @@ class NotificationService {
     } catch (_) {
       _ready = false;
     }
+    try {
+      _tts = FlutterTts();
+      await _tts!.setLanguage('en-US');
+      await _tts!.setSpeechRate(0.95);
+    } catch (_) {
+      _tts = null;
+    }
   }
 
   /// Nudge about [quest]. Bold nudges use max importance; gentle ones high.
-  /// Audio cues ride on the notification sound until TTS lands.
-  Future<void> nudge(Quest quest, {required bool bold}) async {
+  /// When [speak] is true the system voice also reads the nudge out loud.
+  Future<void> nudge(Quest quest, {required bool bold, bool speak = false}) async {
     if (_memory || !_ready || _plugin == null) return;
     try {
       final androidDetails = AndroidNotificationDetails(
@@ -49,8 +59,39 @@ class NotificationService {
         NotificationDetails(android: androidDetails),
         payload: quest.id,
       );
+      if (speak) await this.speak('${quest.title}. ${quest.why}');
     } catch (_) {
       // A missed nudge must never crash the app.
     }
+  }
+
+  /// Plain nudge without a quest, used by the background check.
+  Future<void> nudgeSimple(String title, String body) async {
+    if (_memory || !_ready || _plugin == null) return;
+    try {
+      const androidDetails = AndroidNotificationDetails(
+        'sidequests_nudges',
+        'Adventure nudges',
+        channelDescription: 'Little reasons to look up.',
+        importance: Importance.high,
+        priority: Priority.high,
+      );
+      await _plugin!.show(
+        title.hashCode,
+        title,
+        body,
+        const NotificationDetails(android: androidDetails),
+      );
+    } catch (_) {
+      // A missed nudge must never crash the app.
+    }
+  }
+
+  /// Reads [text] out loud. Silent no-op when voice is unavailable.
+  Future<void> speak(String text) async {
+    if (_memory || _tts == null) return;
+    try {
+      await _tts!.speak(text);
+    } catch (_) {}
   }
 }

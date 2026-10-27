@@ -26,6 +26,9 @@ class ProfileProvider extends ChangeNotifier {
     await _prefs.save(profile);
   }
 
+  /// Remembers sunset for the background check. Skips revision on purpose.
+  Future<void> noteSunset(String iso) => _prefs.saveLastSunset(iso);
+
   Future<void> toggleSave(Quest quest) {
     return update((p) {
       if (p.savedQuestIds.contains(quest.id)) {

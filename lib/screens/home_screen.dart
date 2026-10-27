@@ -36,6 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final profiles = context.read<ProfileProvider>();
     final quests = context.read<QuestProvider>();
     await quests.refresh(profiles.profile, autoNudge: autoNudge);
+    final sunset = quests.device.weather?.sunset ?? '';
+    if (sunset.isNotEmpty) {
+      await profiles.noteSunset(sunset);
+    }
     _seenRevision = profiles.revision;
   }
 

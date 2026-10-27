@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sidequests/screens/splash_screen.dart';
 import 'package:sidequests/services/context_service.dart';
 import 'package:sidequests/services/notification_service.dart';
+import 'package:sidequests/services/nudge_scheduler.dart';
 import 'package:sidequests/services/preferences_service.dart';
 import 'package:sidequests/state/profile_provider.dart';
 import 'package:sidequests/state/quest_provider.dart';
@@ -19,6 +20,12 @@ Future<void> main() async {
     await notifications.init();
   } catch (_) {
     // Notifications are a bonus; the app works without them.
+  }
+
+  try {
+    await NudgeScheduler.apply(profiles.profile.skillEnabled);
+  } catch (_) {
+    // Background checks are a bonus; the app works without them.
   }
 
   runApp(

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sidequests/models/quest.dart';
 import 'package:sidequests/models/user_profile.dart';
 import 'package:sidequests/screens/quest_detail_screen.dart';
+import 'package:sidequests/services/nudge_scheduler.dart';
 import 'package:sidequests/services/quest_catalog.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 import 'package:sidequests/state/profile_provider.dart';
@@ -134,11 +135,14 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           title: const Text('Sidequests skill'),
           subtitle: const Text('Let Muse watch for moments worth a nudge.'),
           value: profile.skillEnabled,
-          onChanged: (value) => profiles.update((p) => p.skillEnabled = value),
+          onChanged: (value) async {
+            await profiles.update((p) => p.skillEnabled = value);
+            await NudgeScheduler.apply(value);
+          },
         ),
         SwitchListTile(
           title: const Text('Audio cues'),
-          subtitle: const Text('Spoken nudges. For now, the notification sound.'),
+          subtitle: const Text('The voice reads nudges out loud.'),
           value: profile.audioCues,
           onChanged: (value) => profiles.update((p) => p.audioCues = value),
         ),
@@ -154,6 +158,22 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           value: profile.suggestWhenTraveling,
           onChanged: (value) =>
               profiles.update((p) => p.suggestWhenTraveling = value),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16, bottom: 8),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () async {
+                final result = await runNudgeCheck();
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(result)),
+                );
+              },
+              child: const Text('Run nudge check now'),
+            ),
+          ),
         ),
         const SizedBox(height: 20),
         const SectionHeader(title: 'How learning works'),
