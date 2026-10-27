@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -5,42 +6,91 @@ import 'package:http/http.dart' as http;
 import 'package:sidequests/models/quest.dart';
 
 /// Real nearby places from OpenStreetMap via the Overpass API. Keyless.
-/// Falls back to an empty list (the app then shows an empty state).
 class PlacesService {
-  /// Public Overpass instances, tried in order. Single instances flap
-  /// often enough that failover is worth it.
+  /// Public Overpass instances, raced in parallel. Single instances flap
+  /// often enough that racing beats sequential failover.
   static const _endpoints = [
     'https://overpass-api.de/api/interpreter',
     'https://overpass.kumi.systems/api/interpreter',
     'https://overpass.private.coffee/api/interpreter',
   ];
 
-  Future<List<Quest>> nearby(double latitude, double longitude) async {
+  Future<PlacesOutcome> nearby(
+    double latitude,
+    double longitude, {
+    http.Client? client,
+  }) async {
     final query = '''
 [out:json][timeout:15];
 (
-  nwr(around:2500,$latitude,$longitude)["name"]["tourism"~"viewpoint|museum|attraction|artwork|gallery"];
-  nwr(around:2500,$latitude,$longitude)["name"]["leisure"~"park|garden|nature_reserve"];
-  nwr(around:2500,$latitude,$longitude)["name"]["historic"];
+  nwr(around:2000,$latitude,$longitude)["name"]["tourism"~"viewpoint|museum|attraction|artwork|gallery"];
+  nwr(around:2000,$latitude,$longitude)["name"]["leisure"~"park|garden|nature_reserve"];
+  nwr(around:2000,$latitude,$longitude)["name"]["historic"];
   nwr(around:2000,$latitude,$longitude)["name"]["amenity"~"marketplace|cafe"];
 );
 out center 30;
 ''';
-    for (final endpoint in _endpoints) {
-      try {
-        final uri = Uri.parse(
-          '$endpoint?data=${Uri.encodeQueryComponent(query)}',
+    final httpClient = client ?? http.Client();
+    try {
+      final done = Completer<PlacesOutcome>();
+      var pending = _endpoints.length;
+      var answered = false;
+      for (final endpoint in _endpoints) {
+        _tryEndpoint(httpClient, endpoint, query, latitude, longitude).then(
+          (quests) {
+            if (done.isCompleted) return;
+            if (quests != null && quests.isNotEmpty) {
+              done.complete(
+                PlacesOutcome(quests: quests, failed: false),
+              );
+            } else {
+              if (quests != null) answered = true;
+              pending--;
+              if (pending == 0) {
+                done.complete(
+                  PlacesOutcome(quests: const [], failed: !answered),
+                );
+              }
+            }
+          },
         );
-        final response = await http.get(uri).timeout(const Duration(seconds: 12));
-        if (response.statusCode != 200) continue;
-        final quests = parseOverpass(response.body, latitude, longitude);
-        if (quests.isNotEmpty) return quests;
-      } catch (_) {
-        continue;
       }
+      return done.future;
+    } finally {
+      if (client == null) httpClient.close();
     }
-    return [];
   }
+
+  /// Null when the endpoint failed; possibly empty when it answered.
+  Future<List<Quest>?> _tryEndpoint(
+    http.Client client,
+    String endpoint,
+    String query,
+    double latitude,
+    double longitude,
+  ) async {
+    try {
+      final uri = Uri.parse(
+        '$endpoint?data=${Uri.encodeQueryComponent(query)}',
+      );
+      final response =
+          await client.get(uri).timeout(const Duration(seconds: 12));
+      if (response.statusCode != 200) return null;
+      return parseOverpass(response.body, latitude, longitude);
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+class PlacesOutcome {
+  const PlacesOutcome({required this.quests, required this.failed});
+
+  final List<Quest> quests;
+
+  /// True only when every endpoint failed. False with empty quests means
+  /// the servers answered but the area is truly bare.
+  final bool failed;
 }
 
 /// Pure Overpass JSON parser, so tests can pin the mapping down.

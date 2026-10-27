@@ -34,6 +34,15 @@ class QuestProvider extends ChangeNotifier {
   bool livePlaces = false;
   bool museUsed = false;
 
+  /// True once a refresh finished (even an empty one). The UI only shows
+  /// the blocking loader before the first finish; later reloads keep
+  /// the old content up with a thin progress bar.
+  bool hasLoaded = false;
+
+  /// True when every places endpoint failed. False with no quests means
+  /// the area is truly bare.
+  bool placesFailed = false;
+
   /// Set when the user taps the map or searches a place. Refresh then
   /// looks around this point instead of the GPS location.
   double? searchLat;
@@ -63,16 +72,16 @@ class QuestProvider extends ChangeNotifier {
       lastContext = context;
       var candidates = <Quest>[];
       livePlaces = false;
+      placesFailed = false;
       final lat = searchLat ?? device.latitude;
       final lon = searchLon ?? device.longitude;
       if (lat != null && lon != null) {
-        final found = await places.nearby(lat, lon);
-        final gigs = await events.upcoming(
-          lat,
-          lon,
-          apiKey: profile.ticketmasterKey,
-        );
-        final live = [...found, ...gigs];
+        final (found, gigs) = await (
+          places.nearby(lat, lon),
+          events.upcoming(lat, lon, apiKey: profile.ticketmasterKey),
+        ).wait;
+        placesFailed = found.failed;
+        final live = [...found.quests, ...gigs];
         if (live.isNotEmpty) {
           candidates = live;
           livePlaces = true;
@@ -123,6 +132,7 @@ class QuestProvider extends ChangeNotifier {
         await sendNudge(profile);
       }
     } finally {
+      hasLoaded = true;
       loading = false;
       notifyListeners();
     }

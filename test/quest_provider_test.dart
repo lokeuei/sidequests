@@ -22,10 +22,14 @@ class _RecordingPlaces extends PlacesService {
   double? seenLon;
 
   @override
-  Future<List<Quest>> nearby(double latitude, double longitude) async {
+  Future<PlacesOutcome> nearby(
+    double latitude,
+    double longitude, {
+    http.Client? client,
+  }) async {
     seenLat = latitude;
     seenLon = longitude;
-    return [];
+    return const PlacesOutcome(quests: [], failed: false);
   }
 }
 

@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final lng = quests.searchLon ?? deviceLng;
     final away = quests.searchingElsewhere;
 
-    if (quests.loading && quests.quests.isEmpty) {
+    if (quests.loading && quests.quests.isEmpty && !quests.hasLoaded) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -232,6 +232,10 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
         children: [
+          if (quests.loading && quests.hasLoaded) ...[
+            const LinearProgressIndicator(),
+            const SizedBox(height: 8),
+          ],
           Text(
             _dateLine(now),
             style: text.bodySmall?.copyWith(
@@ -273,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 20),
           SectionHeader(
             title: away ? 'Over there' : 'Around you',
-            note: away ? 'tap map or search' : 'tap map or search',
+            note: 'tap map or search',
           ).enter(context, delayMs: 200),
           const SizedBox(height: 12),
           TextField(
@@ -389,16 +393,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _emptyState(BuildContext context) {
     final quests = context.read<QuestProvider>();
+    final failed = quests.placesFailed;
     final text = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: Column(
         children: [
-          Text('Nothing live nearby.', style: text.titleLarge),
+          Text(
+            failed ? 'The map lookup failed.' : 'Nothing live nearby.',
+            style: text.titleLarge,
+          ),
           const SizedBox(height: 8),
           Text(
-            'Sidequests needs location and internet for live ideas. '
-            'Pull to refresh, or search another spot above.',
+            failed
+                ? 'The map servers did not answer. Check your internet and try again.'
+                : 'Sidequests needs location and internet for live ideas. '
+                    'Pull to refresh, or search another spot above.',
             style: text.bodyMedium,
             textAlign: TextAlign.center,
           ),

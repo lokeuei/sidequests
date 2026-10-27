@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:sidequests/models/quest.dart';
 import 'package:sidequests/models/weather.dart';
 import 'package:sidequests/services/places_service.dart';
@@ -45,5 +47,33 @@ void main() {
     expect(timeLabel('2026-10-27T19:05'), '7:05 PM');
     expect(timeLabel('2026-10-27T12:00'), '12:00 PM');
     expect(timeLabel('nope'), '');
+  });
+
+  test('first answering endpoint wins the race', () async {
+    final client = MockClient((request) async {
+      if (request.url.host == 'overpass-api.de') {
+        return http.Response('busy', 429);
+      }
+      return http.Response(_fixture, 200);
+    });
+    final outcome = await PlacesService().nearby(59.9, 10.7, client: client);
+    expect(outcome.failed, isFalse);
+    expect(outcome.quests.length, 2);
+  });
+
+  test('all endpoints failing is reported, not silent', () async {
+    final client = MockClient((request) async => http.Response('down', 500));
+    final outcome = await PlacesService().nearby(59.9, 10.7, client: client);
+    expect(outcome.failed, isTrue);
+    expect(outcome.quests, isEmpty);
+  });
+
+  test('answered but bare ground is not a failure', () async {
+    final client = MockClient(
+      (request) async => http.Response('{"elements": []}', 200),
+    );
+    final outcome = await PlacesService().nearby(59.9, 10.7, client: client);
+    expect(outcome.failed, isFalse);
+    expect(outcome.quests, isEmpty);
   });
 }
