@@ -5,14 +5,15 @@ import 'package:sidequests/models/quest.dart';
 
 /// A pin to draw on the map.
 class MapPin {
-  const MapPin({required this.point, required this.label});
+  const MapPin({required this.point, required this.label, required this.questId});
 
   final LatLng point;
   final String label;
+  final String questId;
 }
 
-/// Pins for quests. Live quests carry true coordinates; samples get
-/// deterministic preview offsets around the user.
+/// Pins for quests. Live quests carry true coordinates; the rare one
+/// without gets a deterministic preview offset around the user.
 List<MapPin> pinsForQuests(double centerLat, double centerLng, List<Quest> quests) {
   final pins = <MapPin>[];
   for (var i = 0; i < quests.length; i++) {
@@ -20,6 +21,7 @@ List<MapPin> pinsForQuests(double centerLat, double centerLng, List<Quest> quest
     pins.add(MapPin(
       point: questPoint(centerLat, centerLng, quest, i),
       label: quest.title,
+      questId: quest.id,
     ));
   }
   return pins;

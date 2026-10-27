@@ -22,45 +22,6 @@ class WeatherInfo {
   final String sunrise;
   final String sunset;
 
-  /// Offline sample built around right now. Used when sensors are off.
-  factory WeatherInfo.sample() {
-    final now = DateTime.now();
-    final hourly = <HourlyPoint>[];
-    for (var i = 0; i < 8; i++) {
-      final t = now.add(Duration(hours: i));
-      hourly.add(HourlyPoint(
-        timeIso: _isoHour(t),
-        temperatureC: 19 + (i == 3 ? 2 : 0) - (i > 5 ? 1 : 0),
-        code: 1,
-      ));
-    }
-    final daily = <DailyPoint>[];
-    for (var i = 0; i < 4; i++) {
-      final d = now.add(Duration(days: i));
-      daily.add(DailyPoint(
-        dateIso: _isoHour(d).substring(0, 10),
-        maxC: (21 - i).toDouble(),
-        minC: (14 - i).toDouble(),
-        code: i == 2 ? 3 : 1,
-      ));
-    }
-    final today = _isoHour(now).substring(0, 10);
-    return WeatherInfo(
-      temperatureC: 19,
-      code: 1,
-      highC: 21,
-      lowC: 14,
-      hourly: hourly,
-      daily: daily,
-      sunrise: '${today}T06:30',
-      sunset: '${today}T19:45',
-    );
-  }
-
-  static String _isoHour(DateTime t) {
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${t.year}-${two(t.month)}-${two(t.day)}T${two(t.hour)}:00';
-  }
 }
 
 class HourlyPoint {
@@ -148,4 +109,10 @@ int minutesOfDay(String timeIso) {
   final minute = int.tryParse(timeIso.substring(14, 16));
   if (hour == null || minute == null) return -1;
   return hour * 60 + minute;
+}
+
+/// Renders Celsius [c] in the user's unit ('c' or 'f').
+String tempLabel(double c, String unit) {
+  if (unit == 'f') return '${(c * 9 / 5 + 32).round()}°';
+  return '${c.round()}°';
 }

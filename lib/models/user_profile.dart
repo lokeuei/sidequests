@@ -1,3 +1,5 @@
+import 'package:sidequests/models/quest.dart';
+
 /// What Muse knows about the user: explicit settings plus learned weights.
 ///
 /// Learning happens by default from taps/saves/dismissals; the explicit
@@ -7,7 +9,8 @@ class UserProfile {
     this.displayName = '',
     Set<String>? interests,
     Set<String>? avoid,
-    Set<String>? savedQuestIds,
+    List<Quest>? savedQuests,
+    this.tempUnit = 'c',
     this.nudgeStyle = NudgeStyle.gentle,
     this.audioCues = false,
     this.travelMode = false,
@@ -16,13 +19,18 @@ class UserProfile {
     Map<String, int>? learnedWeights,
   })  : interests = interests ?? <String>{},
         avoid = avoid ?? <String>{},
-        savedQuestIds = savedQuestIds ?? <String>{},
+        savedQuests = savedQuests ?? <Quest>[],
         learnedWeights = learnedWeights ?? <String, int>{};
 
   String displayName;
   Set<String> interests;
   Set<String> avoid;
-  Set<String> savedQuestIds;
+
+  /// Full saved quests (live data has no stable catalog to look up).
+  List<Quest> savedQuests;
+
+  /// 'c' or 'f'.
+  String tempUnit;
   NudgeStyle nudgeStyle;
   bool audioCues;
   bool travelMode;
@@ -32,6 +40,8 @@ class UserProfile {
   /// Tag -> weight. Positive means "more like this". Mirrors the skill
   /// contract deltas: view +1, save +2, go +3, unsave -1, dismiss -2.
   Map<String, int> learnedWeights;
+
+  bool isSaved(String id) => savedQuests.any((q) => q.id == id);
 
   void noteEngagement(Iterable<String> tags, int delta) {
     for (final tag in tags) {
@@ -45,7 +55,8 @@ class UserProfile {
         'displayName': displayName,
         'interests': interests.toList(),
         'avoid': avoid.toList(),
-        'savedQuestIds': savedQuestIds.toList(),
+        'savedQuests': savedQuests.map((q) => q.toJson()).toList(),
+        'tempUnit': tempUnit,
         'nudgeStyle': nudgeStyle.name,
         'audioCues': audioCues,
         'travelMode': travelMode,
@@ -61,17 +72,33 @@ class UserProfile {
       return list.map((e) => e.toString()).toSet();
     }
 
+    List<Quest> questList(Object? value) {
+      final list = value as List?;
+      if (list == null) return <Quest>[];
+      final quests = <Quest>[];
+      for (final entry in list) {
+        try {
+          quests.add(Quest.fromJson((entry as Map).cast<String, Object?>()));
+        } catch (_) {
+          continue;
+        }
+      }
+      return quests;
+    }
+
     Map<String, int> weights(Object? value) {
       final map = value as Map?;
       if (map == null) return <String, int>{};
       return map.map((k, v) => MapEntry(k.toString(), (v as num?)?.toInt() ?? 0));
     }
 
+    final unit = json['tempUnit'] as String? ?? 'c';
     return UserProfile(
       displayName: json['displayName'] as String? ?? '',
       interests: stringSet(json['interests']),
       avoid: stringSet(json['avoid']),
-      savedQuestIds: stringSet(json['savedQuestIds']),
+      savedQuests: questList(json['savedQuests']),
+      tempUnit: unit == 'f' ? 'f' : 'c',
       nudgeStyle: NudgeStyle.values.firstWhere(
         (v) => v.name == (json['nudgeStyle'] as String? ?? 'gentle'),
         orElse: () => NudgeStyle.gentle,

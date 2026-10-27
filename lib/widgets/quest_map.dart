@@ -11,6 +11,7 @@ class QuestMap extends StatelessWidget {
     required this.center,
     required this.pins,
     this.userPoint,
+    this.onPinTap,
     this.height = 200,
     this.zoom = 14,
   });
@@ -20,6 +21,9 @@ class QuestMap extends StatelessWidget {
 
   /// Where the user dot goes. Defaults to the center.
   final LatLng? userPoint;
+
+  /// Fires with the tapped pin. Null leaves pins still.
+  final void Function(MapPin pin)? onPinTap;
   final double height;
   final double zoom;
 
@@ -53,19 +57,22 @@ class QuestMap extends StatelessWidget {
                         point: pin.point,
                         width: 40,
                         height: 40,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: scheme.secondary,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: scheme.surface,
-                              width: 2.5,
+                        child: GestureDetector(
+                          onTap: onPinTap == null ? null : () => onPinTap!(pin),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: scheme.secondary,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: scheme.surface,
+                                width: 2.5,
+                              ),
                             ),
-                          ),
-                          child: Icon(
-                            Icons.location_on,
-                            color: scheme.onSecondary,
-                            size: 20,
+                            child: Icon(
+                              Icons.location_on,
+                              color: scheme.onSecondary,
+                              size: 20,
+                            ),
                           ),
                         ),
                       ),

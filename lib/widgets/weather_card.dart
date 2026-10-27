@@ -3,9 +3,10 @@ import 'package:sidequests/models/weather.dart';
 
 /// Classic weather app block: big temp, condition, hourly strip, daily rows.
 class WeatherCard extends StatelessWidget {
-  const WeatherCard({super.key, required this.weather});
+  const WeatherCard({super.key, required this.weather, this.tempUnit = 'c'});
 
   final WeatherInfo weather;
+  final String tempUnit;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class WeatherCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${weather.temperatureC.round()}°',
+                tempLabel(weather.temperatureC, tempUnit),
                 style: text.displayLarge,
               ),
               const SizedBox(width: 16),
@@ -53,7 +54,7 @@ class WeatherCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'H:${weather.highC.round()}° L:${weather.lowC.round()}°',
+                        'H:${tempLabel(weather.highC, tempUnit)} L:${tempLabel(weather.lowC, tempUnit)}',
                         style: text.bodyMedium?.copyWith(
                           color: scheme.onSurface.withValues(alpha: 0.7),
                         ),
@@ -99,7 +100,7 @@ class WeatherCard extends StatelessWidget {
                         Icon(_iconFor(h.code), size: 20),
                         const SizedBox(height: 6),
                         Text(
-                          '${h.temperatureC.round()}°',
+                          tempLabel(h.temperatureC, tempUnit),
                           style: text.bodyMedium,
                         ),
                       ],
@@ -128,13 +129,16 @@ class WeatherCard extends StatelessWidget {
                     Icon(_iconFor(d.code), size: 20),
                     const Spacer(),
                     Text(
-                      '${d.minC.round()}°',
+                      tempLabel(d.minC, tempUnit),
                       style: text.bodyMedium?.copyWith(
                         color: scheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Text('${d.maxC.round()}°', style: text.bodyMedium),
+                    Text(
+                      tempLabel(d.maxC, tempUnit),
+                      style: text.bodyMedium,
+                    ),
                   ],
                 ),
               );

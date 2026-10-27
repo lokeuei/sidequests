@@ -41,4 +41,11 @@ void main() {
     expect(minutesOfDay('2026-10-27T00:00'), 0);
     expect(minutesOfDay('nope'), -1);
   });
+
+  test('temperature labels honor the unit', () {
+    expect(tempLabel(19, 'c'), '19°');
+    expect(tempLabel(19, 'f'), '66°');
+    expect(tempLabel(0, 'f'), '32°');
+    expect(tempLabel(-5, 'c'), '-5°');
+  });
 }

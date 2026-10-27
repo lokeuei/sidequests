@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:sidequests/models/weather.dart';
 import 'package:sidequests/services/context_service.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 
 /// The automatic inputs, at a glance: daylight, temperature, place, travel.
 class ContextRow extends StatelessWidget {
-  const ContextRow({super.key, required this.device, required this.hour});
+  const ContextRow({
+    super.key,
+    required this.device,
+    required this.hour,
+    this.tempUnit = 'c',
+  });
 
   final DeviceContext device;
   final int hour;
+  final String tempUnit;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +24,11 @@ class ContextRow extends StatelessWidget {
       children: [
         _chip(context, Icons.wb_twilight, daylightLabel(hour)),
         if (device.temperatureC != null)
-          _chip(context, Icons.thermostat, '${device.temperatureC!.round()}°'),
+          _chip(
+            context,
+            Icons.thermostat,
+            tempLabel(device.temperatureC!, tempUnit),
+          ),
         _chip(context, Icons.place_outlined, device.placeLabel),
         if (device.traveling)
           _chip(context, Icons.flight_takeoff, 'Away from home', highlight: true),
