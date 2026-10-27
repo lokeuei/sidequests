@@ -1,3 +1,6 @@
+// ignore_for_file: avoid_print
+// One-line outcomes print to the dev console so Muse failures
+// (bad status, parse miss) can be diagnosed from `flutter run` output.
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -27,6 +30,7 @@ class MuseBrain {
         : (apiKey != null && apiKey.trim().isNotEmpty ? apiKey.trim() : '');
     if (key.isEmpty || candidates.isEmpty) return null;
     final httpClient = client ?? http.Client();
+    final stopwatch = Stopwatch()..start();
     try {
       final response = await httpClient
           .post(
@@ -54,9 +58,19 @@ class MuseBrain {
             }),
           )
           .timeout(const Duration(seconds: 25));
-      if (response.statusCode != 200) return null;
-      return parseMuseResponse(response.body, candidates);
-    } catch (_) {
+      if (response.statusCode != 200) {
+        print('muse: api said ${response.statusCode} (model $model)');
+        return null;
+      }
+      final suggestion = parseMuseResponse(response.body, candidates);
+      if (suggestion == null) {
+        print('muse: reply did not parse');
+        return null;
+      }
+      print('muse: ranked ${suggestion.picks.length} in ${stopwatch.elapsedMilliseconds}ms');
+      return suggestion;
+    } catch (e) {
+      print('muse: call failed ($e)');
       return null;
     } finally {
       if (client == null) httpClient.close();
