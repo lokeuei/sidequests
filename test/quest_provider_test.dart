@@ -163,4 +163,15 @@ void main() {
     expect(text, contains('On Saturday.'));
     expect(text, contains('Best Saturday.'));
   });
+
+  test('refresh stamps when it finished', () async {
+    final places = _RecordingPlaces();
+    final events = _RecordingEvents();
+    final quests = _provider(places, events);
+    expect(quests.refreshedAt, isNull);
+    await quests.refresh(UserProfile(), autoNudge: false);
+    expect(quests.refreshedAt, isNotNull);
+    expect(DateTime.now().difference(quests.refreshedAt!),
+        lessThan(const Duration(minutes: 1)));
+  });
 }

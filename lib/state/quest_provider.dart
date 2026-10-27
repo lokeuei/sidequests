@@ -44,6 +44,10 @@ class QuestProvider extends ChangeNotifier {
   /// the old content up with a thin progress bar.
   bool hasLoaded = false;
 
+  /// When results last finished loading. Tabs use it to decide whether
+  /// the cached results are too old to keep.
+  DateTime? refreshedAt;
+
   /// True when every places endpoint failed. False with no quests means
   /// the area is truly bare.
   bool placesFailed = false;
@@ -175,6 +179,7 @@ class QuestProvider extends ChangeNotifier {
     } finally {
       loadStatus = '';
       hasLoaded = true;
+      refreshedAt = DateTime.now();
       loading = false;
       notifyListeners();
     }

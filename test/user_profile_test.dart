@@ -46,4 +46,30 @@ void main() {
         UserProfile.fromJson(UserProfile(voiceRate: 0.7).toJson());
     expect(back.voiceRate, 0.7);
   });
+
+  test('results key ignores display-only tweaks', () {
+    final before = UserProfile(interests: {'parks'}).resultsKey;
+    final after = UserProfile(
+      interests: {'parks'},
+      displayName: 'Sam',
+      tempUnit: 'f',
+      voiceRate: 0.8,
+      audioCues: true,
+      learnedWeights: {'parks': 5},
+    ).resultsKey;
+    expect(after, before);
+  });
+
+  test('results key moves on interests, travel, and keys', () {
+    final base = UserProfile(interests: {'parks'}).resultsKey;
+    expect(UserProfile(interests: {'parks', 'gigs'}).resultsKey,
+        isNot(base));
+    expect(UserProfile(interests: {'parks'}, travelMode: true).resultsKey,
+        isNot(base));
+    expect(
+        UserProfile(interests: {'parks'}, ticketmasterKey: 'k').resultsKey,
+        isNot(base));
+    expect(UserProfile(interests: {'parks'}, museApiKey: 'k').resultsKey,
+        isNot(base));
+  });
 }

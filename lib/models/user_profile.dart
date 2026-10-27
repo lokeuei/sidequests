@@ -83,6 +83,24 @@ class UserProfile {
 
   int weightFor(String tag) => learnedWeights[tag] ?? 0;
 
+  /// Fingerprint of the settings that change results. Display-only picks
+  /// (name, units, voice, saves) stay out, so tweaking them never
+  /// triggers a fresh location and Mint lookup. Learned weights stay out
+  /// too; they apply on the next natural refresh.
+  String get resultsKey {
+    final likes = [...interests]..sort();
+    final skips = [...avoid]..sort();
+    return [
+      likes.join(','),
+      skips.join(','),
+      travelMode,
+      skillEnabled,
+      suggestWhenTraveling,
+      museApiKey.trim(),
+      ticketmasterKey.trim(),
+    ].join('|');
+  }
+
   Map<String, Object?> toJson() => {
         'displayName': displayName,
         'interests': interests.toList(),

@@ -29,7 +29,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _tab = 0;
-  int _seenRevision = 0;
+  String _seenQuery = '';
   int _cardIndex = 0;
   bool _searching = false;
   late final TextEditingController _search;
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (sunset.isNotEmpty) {
       await profiles.noteSunset(sunset);
     }
-    _seenRevision = profiles.revision;
+    _seenQuery = profiles.profile.resultsKey;
     if (mounted) setState(() => _cardIndex = 0);
   }
 
@@ -302,19 +302,32 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   : null,
             ),
-      body: switch (_tab) {
-        0 => _buildNearby(context),
-        1 => _buildForYou(context),
-        2 => _buildMuse(context),
-        _ => const PreferencesScreen(),
-      },
+      body: IndexedStack(
+        index: _tab,
+        children: [
+          _buildNearby(context),
+          _buildForYou(context),
+          _buildMuse(context),
+          const PreferencesScreen(),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
         onDestinationSelected: (index) {
           setState(() => _tab = index);
-          if ((index == 0 || index == 1) &&
-              context.read<ProfileProvider>().revision != _seenRevision) {
-            _refresh(autoNudge: false);
+          // Tabs keep their old results. Only reload when a setting that
+          // changes results moved, or the cached results are getting old.
+          if (index == 0 || index == 1) {
+            final quests = context.read<QuestProvider>();
+            final profile = context.read<ProfileProvider>().profile;
+            final seen = quests.refreshedAt;
+            final stale = seen == null ||
+                DateTime.now().difference(seen) >
+                    const Duration(minutes: 15);
+            if ((profile.resultsKey != _seenQuery || stale) &&
+                !quests.loading) {
+              _refresh(autoNudge: false);
+            }
           }
         },
         destinations: const [
