@@ -77,7 +77,7 @@ void main() {
       ['social'],
     );
     expect(pickGig([meh], profile, now), isNull);
-    final dateless = Quest(
+    const dateless = Quest(
       id: 'tm-x',
       title: 'Mystery Show',
       blurb: 'Tickets still listed.',
