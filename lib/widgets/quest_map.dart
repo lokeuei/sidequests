@@ -10,12 +10,16 @@ class QuestMap extends StatelessWidget {
     super.key,
     required this.center,
     required this.pins,
+    this.userPoint,
     this.height = 200,
     this.zoom = 14,
   });
 
   final LatLng center;
   final List<MapPin> pins;
+
+  /// Where the user dot goes. Defaults to the center.
+  final LatLng? userPoint;
   final double height;
   final double zoom;
 
@@ -66,7 +70,7 @@ class QuestMap extends StatelessWidget {
                         ),
                       ),
                     Marker(
-                      point: center,
+                      point: userPoint ?? center,
                       width: 22,
                       height: 22,
                       child: Container(

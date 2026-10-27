@@ -86,13 +86,14 @@ class QuestDetailScreen extends StatelessWidget {
           const SizedBox(height: 14),
           if (lat != null && lng != null) ...[
             QuestMap(
-              center: LatLng(lat, lng),
+              center: questPoint(lat, lng, quest, 0),
               pins: [
                 MapPin(
-                  point: previewPin(lat, lng, quest.id, 0),
+                  point: questPoint(lat, lng, quest, 0),
                   label: quest.title,
                 ),
               ],
+              userPoint: LatLng(lat, lng),
               height: 220,
               zoom: 15,
             ),
