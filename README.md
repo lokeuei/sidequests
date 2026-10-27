@@ -23,8 +23,9 @@ AI that reconnects you with the real world instead of pulling you away from it.
   its picks.
 - **Travel mode**: when you're >80 km from home (or toggle it manually),
   rankings lean into local gems. Muse can suggest turning it on.
-- **Muse skill spec**: `muse-skill/` defines the ongoing-skill contract the
-  ranker implements, so live Muse reasoning can slot in later.
+- **Muse picks**: with a Meta Model API key the app sends Muse the date,
+  time, weather, your prefs, and the live list, and Muse ranks it. Without a
+  key the local ranker covers, using the same contract in `muse-skill/`.
 - **Painted cover art**: every quest gets in-code cover art, no downloads.
 - **Maps + weather**: OpenStreetMap pins around you (no API key) and a classic
   weather block with hourly and daily rows. Pins open quest details on tap.
@@ -47,6 +48,13 @@ flutter pub get
 flutter run                                # pick your Pixel 9
 ```
 
+With live gigs and Muse picks:
+
+```sh
+flutter run --dart-define=TICKETMASTER_KEY=your_key \
+  --dart-define=MUSE_API_KEY=your_key
+```
+
 Checks:
 
 ```sh
@@ -63,6 +71,7 @@ lib/
   models/                   Quest, UserProfile, WeatherInfo (JSON-persisted)
   services/
     suggestion_engine.dart  Pure-Dart ranker behind the muse-skill contract
+    muse_brain.dart         Muse ranking: prompt, API call, reply parsing
     places_service.dart     Live OpenStreetMap POIs via Overpass (keyless)
     events_service.dart     Ticketmaster gigs (needs free API key)
     context_service.dart    Geolocator + Open-Meteo + place names, honest stubs
@@ -78,8 +87,9 @@ muse-skill/                 Ongoing-skill contract for Muse (triggers, signals,
 test/                       Unit + widget tests with sample fixtures
 ```
 
-The UI never talks to Muse directly. It talks to `rankQuests()`. When the
-live skill lands, only `suggestion_engine.dart` (and its tests) change.
+The UI never scores quests itself. The provider asks Muse first when a key is
+set, else the local ranker in `suggestion_engine.dart` covers. Both return the
+same ranked shape, so the UI never changes.
 
 ## Design notes
 
@@ -90,7 +100,7 @@ live skill lands, only `suggestion_engine.dart` (and its tests) change.
 
 ## Roadmap
 
-- Live Muse reasoning behind `rankQuests()` (see `muse-skill/SKILL.md`)
+- Muse key entry in the You tab (no rebuild needed)
 - iOS shell polish + TestFlight (`flutter create` already scaffolds it)
 - Release build with signing, store listing, screenshots
 - Opening hours + sunset countdown per quest

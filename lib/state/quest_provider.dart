@@ -4,6 +4,7 @@ import 'package:sidequests/models/user_profile.dart';
 import 'package:sidequests/models/weather.dart';
 import 'package:sidequests/services/context_service.dart';
 import 'package:sidequests/services/events_service.dart';
+import 'package:sidequests/services/muse_brain.dart';
 import 'package:sidequests/services/notification_service.dart';
 import 'package:sidequests/services/nudge_policy.dart';
 import 'package:sidequests/services/places_service.dart';
@@ -31,6 +32,7 @@ class QuestProvider extends ChangeNotifier {
   String reasoning = '';
   bool loading = false;
   bool livePlaces = false;
+  bool museUsed = false;
   bool _autoNudged = false;
   final List<String> _dismissed = [];
 
@@ -67,12 +69,33 @@ class QuestProvider extends ChangeNotifier {
           livePlaces = true;
         }
       }
-      quests = rankQuests(
+      var ranked = rankQuests(
         candidates: candidates,
         profile: profile,
         context: context,
       ).where((q) => !_dismissed.contains(q.quest.id)).toList();
-      reasoning = _describe(context, profile);
+      var line = _describe(context, profile);
+      museUsed = false;
+      if (candidates.isNotEmpty) {
+        final suggestion = await MuseBrain().suggest(
+          profile: profile,
+          now: now,
+          traveling: context.traveling,
+          weather: device.weather,
+          candidates: candidates,
+        );
+        final picks = suggestion?.picks
+                .where((q) => !_dismissed.contains(q.quest.id))
+                .toList() ??
+            [];
+        if (picks.isNotEmpty) {
+          ranked = picks;
+          if (suggestion!.reasoning.isNotEmpty) line = suggestion.reasoning;
+          museUsed = true;
+        }
+      }
+      quests = ranked;
+      reasoning = line;
       final quiet = inQuietHours(now);
       final nightQuest = quests.isNotEmpty &&
           quests.first.quest.tags

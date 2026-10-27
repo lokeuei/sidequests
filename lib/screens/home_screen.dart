@@ -227,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SectionHeader(
             title: 'Right now',
             note:
-                '${quests.quests.length} ideas${quests.livePlaces ? ' · live' : ''}',
+                '${quests.quests.length} ideas${quests.livePlaces ? ' · live' : ''}${quests.museUsed ? ' · muse' : ''}',
           ).enter(context, delayMs: 240),
           const SizedBox(height: 12),
           if (quests.quests.isEmpty)
