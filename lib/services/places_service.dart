@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:sidequests/models/quest.dart';
 
 /// Real nearby places from OpenStreetMap via the Overpass API. Keyless.
-/// Falls back to an empty list (the app then ranks its sample catalog).
+/// Falls back to an empty list (the app then shows an empty state).
 class PlacesService {
   /// Public Overpass instances, tried in order. Single instances flap
   /// often enough that failover is worth it.

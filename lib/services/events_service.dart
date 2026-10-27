@@ -7,7 +7,7 @@ import 'package:sidequests/models/weather.dart';
 
 /// Ticketmaster events near the user. Needs a free key passed as
 /// --dart-define=TICKETMASTER_KEY=.... Without a key it returns [] and
-/// the app simply ranks places and samples.
+/// the app simply ranks places.
 class EventsService {
   Future<List<Quest>> upcoming(double latitude, double longitude) async {
     const key = String.fromEnvironment('TICKETMASTER_KEY');
