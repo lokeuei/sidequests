@@ -21,7 +21,7 @@ class QuestDetailScreen extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final profiles = context.watch<ProfileProvider>();
     final quests = context.read<QuestProvider>();
-    final saved = profiles.profile.savedQuestIds.contains(quest.id);
+    final saved = profiles.profile.isSaved(quest.id);
     final lat = quests.device.latitude;
     final lng = quests.device.longitude;
 
@@ -91,6 +91,7 @@ class QuestDetailScreen extends StatelessWidget {
                 MapPin(
                   point: questPoint(lat, lng, quest, 0),
                   label: quest.title,
+                  questId: quest.id,
                 ),
               ],
               userPoint: LatLng(lat, lng),
@@ -99,7 +100,7 @@ class QuestDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Sample pin near you. Live places come later.',
+              'Approximate area.',
               style: text.bodySmall?.copyWith(
                 color: scheme.onSurface.withValues(alpha: 0.65),
               ),

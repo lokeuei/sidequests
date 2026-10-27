@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:sidequests/models/quest.dart';
 import 'package:sidequests/models/user_profile.dart';
 import 'package:sidequests/models/weather.dart';
 import 'package:sidequests/services/context_service.dart';
@@ -6,11 +7,10 @@ import 'package:sidequests/services/events_service.dart';
 import 'package:sidequests/services/notification_service.dart';
 import 'package:sidequests/services/nudge_policy.dart';
 import 'package:sidequests/services/places_service.dart';
-import 'package:sidequests/services/quest_catalog.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 
 /// Ranked quests for "right now", plus the reasoning line the UI shows.
-/// Uses live nearby places and events when online, samples when not.
+/// Live nearby places and events only. No samples, no stubs.
 class QuestProvider extends ChangeNotifier {
   QuestProvider({
     required this.contextService,
@@ -50,7 +50,7 @@ class QuestProvider extends ChangeNotifier {
         sunsetMinutes: minutesOfDay(device.weather?.sunset ?? ''),
       );
       lastContext = context;
-      var candidates = questCatalog;
+      var candidates = <Quest>[];
       livePlaces = false;
       if (device.latitude != null && device.longitude != null) {
         final found = await places.nearby(
@@ -62,7 +62,7 @@ class QuestProvider extends ChangeNotifier {
           device.longitude!,
         );
         final live = [...found, ...gigs];
-        if (live.length >= 3) {
+        if (live.isNotEmpty) {
           candidates = live;
           livePlaces = true;
         }

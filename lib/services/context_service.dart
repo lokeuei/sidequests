@@ -75,12 +75,8 @@ class ContextService {
     }
   }
 
-  DeviceContext _stub() => DeviceContext(
-        placeLabel: 'Your neighborhood',
-        temperatureC: 19,
-        weatherCode: 1,
-        weather: WeatherInfo.sample(),
-      );
+  DeviceContext _stub() =>
+      const DeviceContext(placeLabel: 'Location off');
 
   Future<Position?> _position() async {
     final enabled = await Geolocator.isLocationServiceEnabled();

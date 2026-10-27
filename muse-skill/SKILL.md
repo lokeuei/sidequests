@@ -1,7 +1,7 @@
 # Sidequests skill for Muse
 
 - **Name:** `sidequests`
-- **Version:** 0.1.0 (stub contract; reasoning engine not yet live)
+- **Version:** 0.2.0 (local ranker on live data; Muse reasoning not yet live)
 - **Kind:** ongoing skill, always eligible. It fires on moments, not queries.
 - **Client:** Sidequests Flutter app (Android now, iOS later)
 

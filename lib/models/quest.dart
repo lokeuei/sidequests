@@ -50,6 +50,42 @@ class Quest {
     final m = minutes % 60;
     return m == 0 ? '${h}h' : '${h}h ${m}m';
   }
+
+  Map<String, Object?> toJson() => {
+        'id': id,
+        'title': title,
+        'blurb': blurb,
+        'category': category.name,
+        'minutes': minutes,
+        'meters': meters,
+        'tags': tags,
+        'why': why,
+        'bestWindow': bestWindow,
+        'latitude': latitude,
+        'longitude': longitude,
+        'startsAt': startsAt,
+      };
+
+  factory Quest.fromJson(Map<String, Object?> json) {
+    final tags = (json['tags'] as List?) ?? [];
+    return Quest(
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      blurb: json['blurb'] as String? ?? '',
+      category: QuestCategory.values.firstWhere(
+        (v) => v.name == (json['category'] as String? ?? 'outdoors'),
+        orElse: () => QuestCategory.outdoors,
+      ),
+      minutes: (json['minutes'] as num?)?.toInt() ?? 0,
+      meters: (json['meters'] as num?)?.toInt() ?? 0,
+      tags: tags.map((e) => e.toString()).toList(),
+      why: json['why'] as String? ?? '',
+      bestWindow: json['bestWindow'] as String? ?? '',
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      startsAt: json['startsAt'] as String? ?? '',
+    );
+  }
 }
 
 enum QuestCategory { outdoors, culture, food, water, night, social, quiet }

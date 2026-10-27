@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sidequests/models/quest.dart';
 import 'package:sidequests/models/user_profile.dart';
 import 'package:sidequests/screens/quest_detail_screen.dart';
 import 'package:sidequests/services/nudge_scheduler.dart';
-import 'package:sidequests/services/quest_catalog.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 import 'package:sidequests/state/profile_provider.dart';
 import 'package:sidequests/widgets/enter_animation.dart';
@@ -40,9 +38,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     final profile = profiles.profile;
     final text = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
-    final saved = questCatalog
-        .where((q) => profile.savedQuestIds.contains(q.id))
-        .toList();
+    final saved = profile.savedQuests;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
@@ -110,6 +106,18 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                 }),
               ),
           ],
+        ),
+        const SizedBox(height: 20),
+        const SectionHeader(title: 'Temperature'),
+        const SizedBox(height: 8),
+        SegmentedButton<String>(
+          segments: const [
+            ButtonSegment(value: 'c', label: Text('°C')),
+            ButtonSegment(value: 'f', label: Text('°F')),
+          ],
+          selected: {profile.tempUnit},
+          onSelectionChanged: (selection) =>
+              profiles.update((p) => p.tempUnit = selection.first),
         ),
         const SizedBox(height: 20),
         const SectionHeader(title: 'Nudges'),

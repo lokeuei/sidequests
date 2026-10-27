@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sidequests/models/user_profile.dart';
-import 'package:sidequests/services/quest_catalog.dart';
+import '../fixtures/sample_quests.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 
 void main() {

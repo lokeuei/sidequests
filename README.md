@@ -11,29 +11,29 @@ AI that reconnects you with the real world instead of pulling you away from it.
 
 ## What v1 does (Pixel 9 / Android)
 
-- **Explore tab**: a short, ranked list of quests "right now", with a
+- **Explore tab**: a short, ranked list of live quests "right now", with a
   plain-language reason for each ("golden hour light, made for tonight").
 - **Automatic context**: device location (with permission), keyless weather
   from Open-Meteo, time of day, and travel detection. No weather API key needed.
 - **Nudges**: local notifications for the top quest; a louder style when
-  "Bold" is on. Audio cues ride on the notification sound for now.
-- **Painted cover art**: every quest gets in-code cover art, no downloads.
-- **Maps + weather**: OpenStreetMap pins around you (no API key) and a classic
-  weather block with hourly and daily rows.
-- **Live places**: real nearby spots from OpenStreetMap when online, samples
-  when not. The list header tells you which.
-- **Background nudges**: a periodic check sends a golden-hour nudge even with
-  the app closed. Quiet hours are 10 PM to 8 AM.
-- **Spoken cues**: turn on Audio cues and the system voice reads nudges aloud.
-- **Events (needs key)**: Ticketmaster gigs near you when you pass a free API
-  key. See the setup guide.
-- **You tab**: name, interests ("love" / "less of"), nudge style, travel mode,
-  saved quests, and a reset. By default Muse learns from taps, saves,
-  dismissals, and "Let's go" presses. Explicit settings improve its picks.
+  "Bold" is on. Turn on Audio cues and the system voice reads them aloud.
+- **You tab**: name, interests ("love" / "less of"), temperature unit, nudge
+  style, travel mode, saved quests, and a reset. By default Muse learns from
+  taps, saves, dismissals, and "Let's go" presses. Explicit settings improve
+  its picks.
 - **Travel mode**: when you're >80 km from home (or toggle it manually),
   rankings lean into local gems. Muse can suggest turning it on.
-- **Muse skill spec**: `muse-skill/` defines the ongoing-skill contract so the
-  stub engine can be swapped for live Muse reasoning without touching the UI.
+- **Muse skill spec**: `muse-skill/` defines the ongoing-skill contract the
+  ranker implements, so live Muse reasoning can slot in later.
+- **Painted cover art**: every quest gets in-code cover art, no downloads.
+- **Maps + weather**: OpenStreetMap pins around you (no API key) and a classic
+  weather block with hourly and daily rows. Pins open quest details on tap.
+- **Live data only**: real nearby spots from OpenStreetMap, gigs from
+  Ticketmaster with a free key, no samples anywhere.
+- **Background nudges**: a periodic check sends a golden-hour nudge even with
+  the app closed. Quiet hours are 10 PM to 8 AM.
+- **Events (needs key)**: Ticketmaster gigs near you when you pass a free API
+  key. See the setup guide.
 
 ## Quickstart
 
@@ -58,21 +58,24 @@ flutter test
 
 ```text
 lib/
-  main.dart                 App boot: prefs → notifications → providers → splash
+  main.dart                 App boot: prefs → notifications → scheduler → splash
   theme/app_theme.dart      "Golden-hour explorer" Material 3 theme (Fraunces + Outfit)
-  models/                   Quest, UserProfile (JSON-persisted, learned weights)
+  models/                   Quest, UserProfile, WeatherInfo (JSON-persisted)
   services/
-    suggestion_engine.dart  Pure-Dart ranker: THE swap point for live Muse.
-                            Same inputs/outputs as muse-skill/ contract.
-    quest_catalog.dart      11 stub quests covering every interest tag
-    context_service.dart    Geolocator + Open-Meteo, graceful stub fallback
-    notification_service.dart  Local nudges (gentle/bold channels)
+    suggestion_engine.dart  Pure-Dart ranker behind the muse-skill contract
+    places_service.dart     Live OpenStreetMap POIs via Overpass (keyless)
+    events_service.dart     Ticketmaster gigs (needs free API key)
+    context_service.dart    Geolocator + Open-Meteo + place names, honest stubs
+    notification_service.dart  Local nudges plus system-voice spoken cues
+    nudge_scheduler.dart    Periodic background golden-hour check (Android)
+    nudge_policy.dart       Quiet hours + golden-hour window (pure, tested)
     preferences_service.dart   SharedPreferences, in-memory variant for tests
   state/                    ProfileProvider (revision-tracked), QuestProvider
-  widgets/                  Quest cards, context chips, reduced-motion entrances
+  widgets/                  Art, cards, maps, weather, logo, reduced-motion entrances
   screens/                  Splash, Explore+You home, quest detail, preferences
 muse-skill/                 Ongoing-skill contract for Muse (triggers, signals,
                             quest JSON, learning deltas, safety)
+test/                       Unit + widget tests with sample fixtures
 ```
 
 The UI never talks to Muse directly. It talks to `rankQuests()`. When the
@@ -87,11 +90,11 @@ live skill lands, only `suggestion_engine.dart` (and its tests) change.
 
 ## Roadmap
 
-- Live Muse skill backend behind `rankQuests()` (see `muse-skill/SKILL.md`)
+- Live Muse reasoning behind `rankQuests()` (see `muse-skill/SKILL.md`)
 - iOS shell polish + TestFlight (`flutter create` already scaffolds it)
-- Real reverse-geocoding, events feed (Ticketmaster/Eventbrite), sunset API
-- Spoken audio cues (TTS), quiet hours, scheduled "golden hour" nudges
-- Home-anchored travel detection that learns where "home" is
+- Release build with signing, store listing, screenshots
+- Opening hours + sunset countdown per quest
+- Home anchor that learns where "home" is
 
 ## License
 

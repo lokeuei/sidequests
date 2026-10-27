@@ -31,11 +31,11 @@ class ProfileProvider extends ChangeNotifier {
 
   Future<void> toggleSave(Quest quest) {
     return update((p) {
-      if (p.savedQuestIds.contains(quest.id)) {
-        p.savedQuestIds.remove(quest.id);
+      if (p.isSaved(quest.id)) {
+        p.savedQuests.removeWhere((q) => q.id == quest.id);
         p.noteEngagement(quest.tags, -1);
       } else {
-        p.savedQuestIds.add(quest.id);
+        p.savedQuests.add(quest);
         p.noteEngagement(quest.tags, 2);
       }
     });

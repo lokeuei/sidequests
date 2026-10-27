@@ -13,7 +13,9 @@ import 'package:sidequests/widgets/quest_card.dart';
 import 'package:sidequests/widgets/weather_card.dart';
 
 void main() {
-  testWidgets('home shows greeting and quest cards', (tester) async {
+  testWidgets('home without location shows greeting and empty state', (
+    tester,
+  ) async {
     GoogleFonts.config.allowRuntimeFetching = false;
 
     final profiles = ProfileProvider(prefs: PreferencesService.memory());
@@ -34,16 +36,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    // Live-only app: no location means no quests, no weather, no fakes.
     expect(find.byKey(const Key('greeting')), findsOneWidget);
-    expect(find.byType(WeatherCard), findsOneWidget);
-    // Cards sit below the weather block, so scroll the outer list
-    // until the lazy ListView builds them.
-    await tester.scrollUntilVisible(
-      find.byType(QuestCard),
-      400,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
-    expect(find.byType(QuestCard), findsWidgets);
+    expect(find.text('Nothing live nearby.'), findsOneWidget);
+    expect(find.byType(QuestCard), findsNothing);
+    expect(find.byType(WeatherCard), findsNothing);
   });
 }

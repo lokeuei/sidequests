@@ -8,6 +8,7 @@ import 'package:sidequests/services/map_pins.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 import 'package:sidequests/state/profile_provider.dart';
 import 'package:sidequests/state/quest_provider.dart';
+import 'package:sidequests/widgets/app_logo.dart';
 import 'package:sidequests/widgets/context_row.dart';
 import 'package:sidequests/widgets/enter_animation.dart';
 import 'package:sidequests/widgets/quest_card.dart';
@@ -66,17 +67,34 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _openPin(MapPin pin) {
+    final quests = context.read<QuestProvider>();
+    for (final scored in quests.quests) {
+      if (scored.quest.id == pin.questId) {
+        _openDetail(scored);
+        return;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'sidequests',
-          style: GoogleFonts.fraunces(
-            fontSize: 22,
-            fontStyle: FontStyle.italic,
-            fontWeight: FontWeight.w600,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const AppLogo(size: 30),
+            const SizedBox(width: 10),
+            Text(
+              'sidequests',
+              style: GoogleFonts.fraunces(
+                fontSize: 22,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
@@ -173,15 +191,21 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ).enter(context, delayMs: 120),
           const SizedBox(height: 14),
-          ContextRow(device: quests.device, hour: now.hour)
-              .enter(context, delayMs: 160),
+          ContextRow(
+            device: quests.device,
+            hour: now.hour,
+            tempUnit: profiles.profile.tempUnit,
+          ).enter(context, delayMs: 160),
           if (quests.device.traveling || profiles.profile.travelMode) ...[
             const SizedBox(height: 12),
             _travelBanner(context),
           ],
           if (weather != null) ...[
             const SizedBox(height: 14),
-            WeatherCard(weather: weather).enter(context, delayMs: 180),
+            WeatherCard(
+              weather: weather,
+              tempUnit: profiles.profile.tempUnit,
+            ).enter(context, delayMs: 180),
           ],
           if (lat != null && lng != null) ...[
             const SizedBox(height: 20),
@@ -195,6 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 lng,
                 quests.quests.map((q) => q.quest).toList(),
               ),
+              onPinTap: _openPin,
               height: 190,
             ).enter(context, delayMs: 220),
           ],
@@ -202,9 +227,8 @@ class _HomeScreenState extends State<HomeScreen> {
           SectionHeader(
             title: 'Right now',
             note:
-                '${quests.quests.length} ideas · ${quests.livePlaces ? 'live' : 'samples'}',
-          )
-              .enter(context, delayMs: 240),
+                '${quests.quests.length} ideas${quests.livePlaces ? ' · live' : ''}',
+          ).enter(context, delayMs: 240),
           const SizedBox(height: 12),
           if (quests.quests.isEmpty)
             _emptyState(context)
@@ -217,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: QuestCard(
                   scored: q,
                   index: i,
-                  saved: profiles.profile.savedQuestIds.contains(q.quest.id),
+                  saved: profiles.profile.isSaved(q.quest.id),
                   onTap: () => _openDetail(q),
                   onSave: () => profiles.toggleSave(q.quest),
                 ),
@@ -267,11 +291,13 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: Column(
         children: [
-          Text('All caught up.', style: text.titleLarge),
+          Text('Nothing live nearby.', style: text.titleLarge),
           const SizedBox(height: 8),
           Text(
-            'Enjoy the quiet, or reshuffle the deck.',
+            'Sidequests needs location and internet for live ideas. '
+            'Pull to refresh to try again.',
             style: text.bodyMedium,
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
           OutlinedButton(
@@ -279,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
               quests.clearDismissed();
               _refresh(autoNudge: false);
             },
-            child: const Text('Show everything again'),
+            child: const Text('Try again'),
           ),
         ],
       ),
