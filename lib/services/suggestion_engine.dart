@@ -20,6 +20,7 @@ const kAllInterests = <String>[
   'mornings',
   'museums',
   'social',
+  'events',
 ];
 
 /// Automatic context the ranker (and later, the Muse skill) reasons over.
@@ -31,19 +32,31 @@ class QuestContext {
     required this.temperatureC,
     required this.weatherCode,
     required this.traveling,
+    this.minute = 0,
+    this.sunsetMinutes = -1,
     this.latitude,
     this.longitude,
   });
 
   final int hour;
+  final int minute;
   final int weekday; // 1 = Monday .. 7 = Sunday
   final double temperatureC;
   final int weatherCode; // Open-Meteo WMO code; -1 = unknown
   final bool traveling;
+
+  /// Minutes since midnight of true sunset, local time. -1 = unknown.
+  final int sunsetMinutes;
   final double? latitude;
   final double? longitude;
 
-  bool get isGoldenHour => hour >= 17 && hour <= 19;
+  /// The 90 minutes before true sunset, or 5-7 PM when sunset is unknown.
+  bool get isGoldenHour {
+    if (sunsetMinutes < 0) return hour >= 17 && hour <= 19;
+    final now = hour * 60 + minute;
+    return now <= sunsetMinutes && sunsetMinutes - now <= 90;
+  }
+
   bool get isMorning => hour >= 6 && hour < 11;
   bool get isNight => hour >= 21 || hour < 5;
   bool get isWeekend => weekday == DateTime.saturday || weekday == DateTime.sunday;

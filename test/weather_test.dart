@@ -35,4 +35,10 @@ void main() {
     expect((first.latitude - 59.9).abs(), lessThan(0.03));
     expect((first.longitude - 10.7).abs(), lessThan(0.03));
   });
+
+  test('minutes of day counts from midnight', () {
+    expect(minutesOfDay('2026-10-27T19:45'), 19 * 60 + 45);
+    expect(minutesOfDay('2026-10-27T00:00'), 0);
+    expect(minutesOfDay('nope'), -1);
+  });
 }

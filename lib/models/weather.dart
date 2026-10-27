@@ -140,3 +140,12 @@ String weekdayLabel(String dateIso) {
     return '';
   }
 }
+
+/// Minutes since midnight for 2026-10-27T19:45. Returns -1 when unknown.
+int minutesOfDay(String timeIso) {
+  if (timeIso.length < 16) return -1;
+  final hour = int.tryParse(timeIso.substring(11, 13));
+  final minute = int.tryParse(timeIso.substring(14, 16));
+  if (hour == null || minute == null) return -1;
+  return hour * 60 + minute;
+}

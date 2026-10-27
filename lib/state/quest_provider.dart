@@ -1,23 +1,29 @@
 import 'package:flutter/foundation.dart';
 import 'package:sidequests/models/user_profile.dart';
+import 'package:sidequests/models/weather.dart';
 import 'package:sidequests/services/context_service.dart';
+import 'package:sidequests/services/events_service.dart';
 import 'package:sidequests/services/notification_service.dart';
+import 'package:sidequests/services/nudge_policy.dart';
 import 'package:sidequests/services/places_service.dart';
 import 'package:sidequests/services/quest_catalog.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 
 /// Ranked quests for "right now", plus the reasoning line the UI shows.
-/// Uses live nearby places when online, samples when not.
+/// Uses live nearby places and events when online, samples when not.
 class QuestProvider extends ChangeNotifier {
   QuestProvider({
     required this.contextService,
     required this.notifications,
     PlacesService? places,
-  }) : places = places ?? PlacesService();
+    EventsService? events,
+  })  : places = places ?? PlacesService(),
+        events = events ?? EventsService();
 
   final ContextService contextService;
   final NotificationService notifications;
   final PlacesService places;
+  final EventsService events;
 
   List<ScoredQuest> quests = [];
   DeviceContext device = const DeviceContext();
@@ -36,10 +42,12 @@ class QuestProvider extends ChangeNotifier {
       final now = DateTime.now();
       final context = QuestContext(
         hour: now.hour,
+        minute: now.minute,
         weekday: now.weekday,
         temperatureC: device.temperatureC ?? 19,
         weatherCode: device.weatherCode,
         traveling: device.traveling || profile.travelMode,
+        sunsetMinutes: minutesOfDay(device.weather?.sunset ?? ''),
       );
       lastContext = context;
       var candidates = questCatalog;
@@ -49,8 +57,13 @@ class QuestProvider extends ChangeNotifier {
           device.latitude!,
           device.longitude!,
         );
-        if (found.length >= 3) {
-          candidates = found;
+        final gigs = await events.upcoming(
+          device.latitude!,
+          device.longitude!,
+        );
+        final live = [...found, ...gigs];
+        if (live.length >= 3) {
+          candidates = live;
           livePlaces = true;
         }
       }
@@ -60,11 +73,19 @@ class QuestProvider extends ChangeNotifier {
         context: context,
       ).where((q) => !_dismissed.contains(q.quest.id)).toList();
       reasoning = _describe(context, profile);
+      final quiet = inQuietHours(now);
+      final nightQuest = quests.isNotEmpty &&
+          quests.first.quest.tags
+              .toSet()
+              .intersection({'night', 'stargazing', 'live music'})
+              .isNotEmpty;
       if (autoNudge &&
           !_autoNudged &&
           context.traveling &&
           profile.skillEnabled &&
-          profile.suggestWhenTraveling) {
+          profile.suggestWhenTraveling &&
+          (!quiet ||
+              (profile.nudgeStyle == NudgeStyle.bold && nightQuest))) {
         _autoNudged = true;
         await sendNudge(profile);
       }
@@ -74,11 +95,13 @@ class QuestProvider extends ChangeNotifier {
     }
   }
 
+  /// Manual nudge. Always allowed, and speaks when audio cues are on.
   Future<void> sendNudge(UserProfile profile) async {
     if (quests.isEmpty) return;
     await notifications.nudge(
       quests.first.quest,
       bold: profile.nudgeStyle == NudgeStyle.bold,
+      speak: profile.audioCues,
     );
   }
 

@@ -12,6 +12,7 @@ class Quest {
     required this.bestWindow,
     this.latitude,
     this.longitude,
+    this.startsAt = '',
   });
 
   final String id;
@@ -36,6 +37,9 @@ class Quest {
 
   final double? latitude;
   final double? longitude;
+
+  /// ISO start for dated events, e.g. 2026-11-01T20:00:00Z. Empty if n/a.
+  final String startsAt;
 
   String get distanceLabel =>
       meters >= 1000 ? '${(meters / 1000).toStringAsFixed(1)} km' : '$meters m';

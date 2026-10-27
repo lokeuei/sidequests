@@ -7,9 +7,16 @@ import 'package:sidequests/models/quest.dart';
 /// Real nearby places from OpenStreetMap via the Overpass API. Keyless.
 /// Falls back to an empty list (the app then ranks its sample catalog).
 class PlacesService {
+  /// Public Overpass instances, tried in order. Single instances flap
+  /// often enough that failover is worth it.
+  static const _endpoints = [
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://overpass.private.coffee/api/interpreter',
+  ];
+
   Future<List<Quest>> nearby(double latitude, double longitude) async {
-    try {
-      final query = '''
+    final query = '''
 [out:json][timeout:15];
 (
   nwr(around:2500,$latitude,$longitude)["name"]["tourism"~"viewpoint|museum|attraction|artwork|gallery"];
@@ -19,15 +26,20 @@ class PlacesService {
 );
 out center 30;
 ''';
-      final uri = Uri.parse(
-        'https://overpass-api.de/api/interpreter?data=${Uri.encodeQueryComponent(query)}',
-      );
-      final response = await http.get(uri).timeout(const Duration(seconds: 20));
-      if (response.statusCode != 200) return [];
-      return parseOverpass(response.body, latitude, longitude);
-    } catch (_) {
-      return [];
+    for (final endpoint in _endpoints) {
+      try {
+        final uri = Uri.parse(
+          '$endpoint?data=${Uri.encodeQueryComponent(query)}',
+        );
+        final response = await http.get(uri).timeout(const Duration(seconds: 12));
+        if (response.statusCode != 200) continue;
+        final quests = parseOverpass(response.body, latitude, longitude);
+        if (quests.isNotEmpty) return quests;
+      } catch (_) {
+        continue;
+      }
     }
+    return [];
   }
 }
 
