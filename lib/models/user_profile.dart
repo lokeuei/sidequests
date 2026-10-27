@@ -1,6 +1,6 @@
 import 'package:sidequests/models/quest.dart';
 
-/// What Muse knows about the user: explicit settings plus learned weights.
+/// What Mint knows about the user: explicit settings plus learned weights.
 ///
 /// Learning happens by default from taps/saves/dismissals; the explicit
 /// interests below only sharpen it.
@@ -61,7 +61,7 @@ class UserProfile {
   void noteLoved(Quest quest) => noteEngagement(quest.tags, 5);
   void noteNotForMe(Quest quest) => noteEngagement(quest.tags, -4);
 
-  /// Tags Muse noticed you love (weight > 0), best first.
+  /// Tags Mint noticed you love (weight > 0), best first.
   List<String> topLearned([int limit = 5]) {
     final entries =
         learnedWeights.entries.where((e) => e.value > 0).toList()
@@ -69,7 +69,7 @@ class UserProfile {
     return entries.take(limit).map((e) => e.key).toList();
   }
 
-  /// Tags Muse noticed you skip (weight < 0), worst first.
+  /// Tags Mint noticed you skip (weight < 0), worst first.
   List<String> topSkipped([int limit = 3]) {
     final entries =
         learnedWeights.entries.where((e) => e.value < 0).toList()
@@ -145,3 +145,6 @@ class UserProfile {
 }
 
 enum NudgeStyle { gentle, bold }
+
+
+

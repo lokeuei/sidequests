@@ -256,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const AppLogo(size: 30),
                   const SizedBox(width: 10),
                   Text(
-                    _tab == 1 ? 'For you' : 'Muse',
+                    _tab == 1 ? 'For you' : 'Mint',
                     style: GoogleFonts.fraunces(
                       fontSize: 22,
                       fontStyle: FontStyle.italic,
@@ -331,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
           NavigationDestination(
             icon: MuseAvatar(size: 26),
             selectedIcon: MuseAvatar(size: 26),
-            label: 'Muse',
+            label: 'Mint',
           ),
           NavigationDestination(
             icon: Icon(Icons.settings_outlined),
@@ -923,7 +923,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SectionHeader(
             title: 'Right now',
             note:
-                '${quests.quests.length} ideas${quests.livePlaces ? ' · live' : ''}${quests.liveGigs ? ' · gigs' : ''}${quests.museUsed ? ' · muse' : ''}',
+                '${quests.quests.length} ideas${quests.livePlaces ? ' · live' : ''}${quests.liveGigs ? ' · gigs' : ''}${quests.museUsed ? ' · mint' : ''}',
           ).enter(context, delayMs: 100),
           const SizedBox(height: 12),
           if (quests.quests.isEmpty)
@@ -990,7 +990,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Muse', style: text.displayMedium),
+                  Text('Mint', style: text.displayMedium),
                   const SizedBox(height: 2),
                   Text(
                     'Mint here. Your taste, in one place.',
@@ -1018,7 +1018,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      keySet ? 'Ranking with Muse' : 'Ranking on-device',
+                      keySet ? 'Ranking with Mint' : 'Ranking on-device',
                       style: text.titleMedium,
                     ),
                     Text(
@@ -1069,7 +1069,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 20),
         const SectionHeader(
-          title: 'What Muse knows',
+          title: 'What Mint knows',
           note: 'updates as you tap',
         ),
         const SizedBox(height: 8),

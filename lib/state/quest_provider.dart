@@ -133,7 +133,7 @@ class QuestProvider extends ChangeNotifier {
       museUsed = false;
       if (candidates.isNotEmpty) {
         if (_hasMuseKey(profile)) {
-          loadStatus = 'Asking Muse…';
+          loadStatus = 'Asking Mint…';
           notifyListeners();
         }
         final suggestion = await MuseBrain().suggest(
@@ -260,3 +260,4 @@ class QuestProvider extends ChangeNotifier {
     return '${lead[0].toUpperCase()}${lead.substring(1)}. A few ideas worth looking up for.';
   }
 }
+

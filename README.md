@@ -18,13 +18,13 @@ AI that reconnects you with the real world instead of pulling you away from it.
 - **Nudges**: local notifications for the top quest; a louder style when
   "Bold" is on. Turn on Audio cues and the system voice reads them aloud.
 - **Settings tab**: name, interests ("love" / "less of"), temperature unit, nudge
-  style, travel mode, saved quests, and a reset. By default Muse learns from
+  style, travel mode, saved quests, and a reset. By default Mint learns from
   taps, saves, dismissals, and "Let's go" presses. Explicit settings improve
   its picks.
 - **Travel mode**: when you're >80 km from home (or toggle it manually),
-  rankings lean into local gems. Muse can suggest turning it on.
-- **Muse picks**: paste a Meta Model API key once in the Settings tab and the app
-  sends Muse the date, time, weather, your prefs, and the live list, and Muse
+  rankings lean into local gems. Mint can suggest turning it on.
+- **Mint picks**: paste a Meta Model API key once in the Settings tab and the app
+  sends Mint the date, time, weather, your prefs, and the live list, and Mint
   ranks it. Without a key the local ranker covers, using the same contract in
   `muse-skill/`.
 - **Painted cover art**: every quest gets in-code cover art, no downloads.
@@ -32,7 +32,7 @@ AI that reconnects you with the real world instead of pulling you away from it.
   weather block with hourly and daily rows. Pins open quest details on tap.
 - **Look elsewhere**: tap the map or type a place ("Bellevue", "Seatac") to
   search around that point instead of your GPS spot. Clear the chip to come back.
-- **Visible learning**: the Settings tab shows what Muse noticed you love and skip.
+- **Visible learning**: the Settings tab shows what Mint noticed you love and skip.
 - **Feedback**: each quest asks how it went. Went, loved it, not for me.
 - **Proactive nudges**: loved-genre gig alerts and weekend ideas, plus golden
   hour, all with quiet hours and no repeats.
@@ -80,7 +80,7 @@ lib/
   models/                   Quest, UserProfile, WeatherInfo (JSON-persisted)
   services/
     suggestion_engine.dart  Pure-Dart ranker behind the muse-skill contract
-    muse_brain.dart         Muse ranking: prompt, API call, reply parsing
+    muse_brain.dart         Mint ranking: prompt, API call, reply parsing
     places_service.dart     Live OpenStreetMap POIs via Overpass (keyless)
     events_service.dart     Ticketmaster gigs (needs free API key)
     context_service.dart    Geolocator + Open-Meteo + place names, honest stubs
@@ -96,7 +96,7 @@ muse-skill/                 Ongoing-skill contract for Muse (triggers, signals,
 test/                       Unit + widget tests with sample fixtures
 ```
 
-The UI never scores quests itself. The provider asks Muse first when a key is
+The UI never scores quests itself. The provider asks Mint first when a key is
 set, else the local ranker in `suggestion_engine.dart` covers. Both return the
 same ranked shape, so the UI never changes.
 

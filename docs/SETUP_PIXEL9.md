@@ -97,9 +97,9 @@ Without the key the app simply skips events. Everything else works.
 Builders can also bake it in with
 `flutter run --dart-define=TICKETMASTER_KEY=your_key_here`.
 
-## 8. Muse key (optional)
+## 8. Mint key (optional)
 
-Muse ranking needs a Meta Model API key:
+Mint ranking needs a Meta Model API key:
 
 1. Sign up in the Meta Developer Console (linked from the Meta Model API
    docs) and create a key. New accounts get free credits to start.

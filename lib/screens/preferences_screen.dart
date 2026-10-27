@@ -52,7 +52,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         Text('Settings', style: text.displayMedium).enter(context),
         const SizedBox(height: 6),
         Text(
-          'Muse learns from your taps, saves, and strolls. '
+          'Mint learns from your taps, saves, and strolls. '
           'The more you tell it, the better its picks.',
           style: text.bodyMedium,
         ).enter(context, delayMs: 60),
@@ -63,7 +63,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           controller: _name,
           textCapitalization: TextCapitalization.words,
           decoration: const InputDecoration(
-            hintText: 'What should Muse call you?',
+            hintText: 'What should Mint call you?',
             border: OutlineInputBorder(),
           ),
           onSubmitted: (value) =>
@@ -151,7 +151,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
         SwitchListTile(
           title: const Text('Sidequests skill'),
-          subtitle: const Text('Let Muse watch for moments worth a nudge.'),
+          subtitle: const Text('Let Mint watch for moments worth a nudge.'),
           value: profile.skillEnabled,
           onChanged: (value) async {
             await profiles.update((p) => p.skillEnabled = value);
@@ -172,7 +172,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
         SwitchListTile(
           title: const Text('Suggest when traveling'),
-          subtitle: const Text('Muse offers to switch modes when you are away.'),
+          subtitle: const Text('Mint offers to switch modes when you are away.'),
           value: profile.suggestWhenTraveling,
           onChanged: (value) =>
               profiles.update((p) => p.suggestWhenTraveling = value),
@@ -202,15 +202,15 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           enableSuggestions: false,
           autocorrect: false,
           decoration: const InputDecoration(
-            labelText: 'Muse key',
-            hintText: 'Lets Muse rank your quests',
+            labelText: 'Mint key',
+            hintText: 'Lets Mint rank your quests',
             border: OutlineInputBorder(),
           ),
           onSubmitted: (value) async {
             await profiles.update((p) => p.museApiKey = value.trim());
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Muse key saved.')),
+                const SnackBar(content: Text('Mint key saved.')),
               );
             }
           },
@@ -238,7 +238,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         const SizedBox(height: 20),
         const SectionHeader(title: 'How learning works'),
         const SizedBox(height: 8),
-        _learnRow(context, Icons.favorite_border, 'Save what you love. Muse notices.'),
+        _learnRow(context, Icons.favorite_border, 'Save what you love. Mint notices.'),
         _learnRow(context, Icons.close, "Dismiss what you don't. It adapts."),
         _learnRow(
           context,
@@ -247,7 +247,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
         const SizedBox(height: 20),
         const SectionHeader(
-          title: 'What Muse knows',
+          title: 'What Mint knows',
           note: 'updates as you tap',
         ),
         const SizedBox(height: 8),
@@ -344,7 +344,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         title: const Text('Reset everything?'),
         content: const Text(
           'This clears your name, interests, saved quests, keys, '
-          'and everything Muse learned.',
+          'and everything Mint learned.',
         ),
         actions: [
           TextButton(
@@ -366,3 +366,13 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+

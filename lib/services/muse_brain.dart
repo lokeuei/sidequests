@@ -1,5 +1,5 @@
 // ignore_for_file: avoid_print
-// One-line outcomes print to the dev console so Muse failures
+// One-line outcomes print to the dev console so Mint failures
 // (bad status, parse miss) can be diagnosed from `flutter run` output.
 import 'dart:convert';
 
@@ -9,7 +9,7 @@ import 'package:sidequests/models/user_profile.dart';
 import 'package:sidequests/models/weather.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 
-/// Asks Muse to rank live candidates. Takes the key in (stored in the
+/// Asks Mint to rank live candidates. Takes the key in (stored in the
 /// profile), or bake one in with --dart-define=MUSE_API_KEY=.... Returns
 /// null without a key or on any failure, and the app falls back to the
 /// local ranker.
@@ -59,7 +59,7 @@ class MuseBrain {
           )
           .timeout(const Duration(seconds: 25));
       if (response.statusCode != 200) {
-        print('muse: api said ${response.statusCode} (model $model)');
+        print('mint: api said ${response.statusCode} (model $model)');
         return null;
       }
       final suggestion = parseMuseResponse(response.body, candidates);
@@ -67,13 +67,13 @@ class MuseBrain {
         final snippet = response.body.length > 600
             ? response.body.substring(0, 600)
             : response.body;
-        print('muse: reply did not parse: $snippet');
+        print('mint: reply did not parse: $snippet');
         return null;
       }
-      print('muse: ranked ${suggestion.picks.length} in ${stopwatch.elapsedMilliseconds}ms');
+      print('mint: ranked ${suggestion.picks.length} in ${stopwatch.elapsedMilliseconds}ms');
       return suggestion;
     } catch (e) {
-      print('muse: call failed ($e)');
+      print('mint: call failed ($e)');
       return null;
     } finally {
       if (client == null) httpClient.close();
@@ -88,7 +88,7 @@ class MuseSuggestion {
   final String reasoning;
 }
 
-/// The exact context Muse sees: date, time, weather, prefs, candidates.
+/// The exact context Mint sees: date, time, weather, prefs, candidates.
 String buildPrompt({
   required UserProfile profile,
   required DateTime now,
@@ -186,3 +186,10 @@ MuseSuggestion? parseMuseResponse(String body, List<Quest> candidates) {
     return null;
   }
 }
+
+
+
+
+
+
+

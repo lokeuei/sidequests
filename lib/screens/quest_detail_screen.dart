@@ -180,7 +180,7 @@ class QuestDetailScreen extends StatelessWidget {
                 await profiles.update((p) => p.noteWent(quest));
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Nice. Muse logged the visit.')),
+                  const SnackBar(content: Text('Nice. Mint logged the visit.')),
                 );
               },
               icon: const Icon(Icons.check),
@@ -196,7 +196,7 @@ class QuestDetailScreen extends StatelessWidget {
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Loved. Muse will find more.'),
+                    content: Text('Loved. Mint will find more.'),
                   ),
                 );
               },
@@ -250,3 +250,5 @@ class QuestDetailScreen extends StatelessWidget {
     );
   }
 }
+
+

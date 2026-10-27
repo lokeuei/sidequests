@@ -125,7 +125,7 @@ void main() {
     await quests.refresh(UserProfile(), autoNudge: false);
     expect(seen, contains('Reading location…'));
     expect(seen, contains('Looking around…'));
-    expect(seen, isNot(contains('Asking Muse…')));
+    expect(seen, isNot(contains('Asking Mint…')));
     expect(quests.loadStatus, isEmpty);
   });
 
@@ -145,3 +145,4 @@ void main() {
     expect(buildBrief([]), 'Nothing to brief yet.');
   });
 }
+

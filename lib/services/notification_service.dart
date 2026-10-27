@@ -1,3 +1,6 @@
+// ignore_for_file: avoid_print
+// The TTS engine line prints once at startup so voice quirks
+// (wrong engine, ignored rate) can be diagnosed from console output.
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:sidequests/models/quest.dart';
@@ -34,7 +37,9 @@ class NotificationService {
     try {
       _tts = FlutterTts();
       await _tts!.setLanguage('en-US');
-      await _tts!.setSpeechRate(0.8);
+      await _tts!.setSpeechRate(0.6);
+      final engines = await _tts!.getEngines;
+      print('voice: engines $engines');
     } catch (_) {
       _tts = null;
     }
