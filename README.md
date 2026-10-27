@@ -30,6 +30,8 @@ AI that reconnects you with the real world instead of pulling you away from it.
 - **Painted cover art**: every quest gets in-code cover art, no downloads.
 - **Maps + weather**: OpenStreetMap pins around you (no API key) and a classic
   weather block with hourly and daily rows. Pins open quest details on tap.
+- **Look elsewhere**: tap the map or type a place ("Bellevue", "Seatac") to
+  search around that point instead of your GPS spot. Clear the chip to come back.
 - **Live data only**: real nearby spots from OpenStreetMap, gigs from
   Ticketmaster with a free key, no samples anywhere.
 - **Background nudges**: a periodic check sends a golden-hour nudge even with

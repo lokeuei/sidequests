@@ -33,6 +33,15 @@ class QuestProvider extends ChangeNotifier {
   bool loading = false;
   bool livePlaces = false;
   bool museUsed = false;
+
+  /// Set when the user taps the map or searches a place. Refresh then
+  /// looks around this point instead of the GPS location.
+  double? searchLat;
+  double? searchLon;
+  String searchLabel = '';
+
+  bool get searchingElsewhere => searchLat != null && searchLon != null;
+
   bool _autoNudged = false;
   final List<String> _dismissed = [];
 
@@ -54,14 +63,13 @@ class QuestProvider extends ChangeNotifier {
       lastContext = context;
       var candidates = <Quest>[];
       livePlaces = false;
-      if (device.latitude != null && device.longitude != null) {
-        final found = await places.nearby(
-          device.latitude!,
-          device.longitude!,
-        );
+      final lat = searchLat ?? device.latitude;
+      final lon = searchLon ?? device.longitude;
+      if (lat != null && lon != null) {
+        final found = await places.nearby(lat, lon);
         final gigs = await events.upcoming(
-          device.latitude!,
-          device.longitude!,
+          lat,
+          lon,
           apiKey: profile.ticketmasterKey,
         );
         final live = [...found, ...gigs];
@@ -128,6 +136,20 @@ class QuestProvider extends ChangeNotifier {
       bold: profile.nudgeStyle == NudgeStyle.bold,
       speak: profile.audioCues,
     );
+  }
+
+  void setSearchPoint(double lat, double lon, String label) {
+    searchLat = lat;
+    searchLon = lon;
+    searchLabel = label;
+    notifyListeners();
+  }
+
+  void clearSearchPoint() {
+    searchLat = null;
+    searchLon = null;
+    searchLabel = '';
+    notifyListeners();
   }
 
   void shuffle() {

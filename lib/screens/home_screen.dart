@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:sidequests/screens/preferences_screen.dart';
 import 'package:sidequests/screens/quest_detail_screen.dart';
+import 'package:sidequests/services/geocode_service.dart';
 import 'package:sidequests/services/map_pins.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 import 'package:sidequests/state/profile_provider.dart';
@@ -26,11 +27,20 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _tab = 0;
   int _seenRevision = 0;
+  bool _searching = false;
+  late final TextEditingController _search;
 
   @override
   void initState() {
     super.initState();
+    _search = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
   }
 
   Future<void> _refresh({bool autoNudge = true}) async {
@@ -74,6 +84,56 @@ class _HomeScreenState extends State<HomeScreen> {
         _openDetail(scored);
         return;
       }
+    }
+  }
+
+  Future<void> _applySearch(double lat, double lon, String label) async {
+    FocusScope.of(context).unfocus();
+    context.read<QuestProvider>().setSearchPoint(lat, lon, label);
+    await _refresh(autoNudge: false);
+  }
+
+  Future<void> _clearSearch() async {
+    _search.clear();
+    context.read<QuestProvider>().clearSearchPoint();
+    await _refresh(autoNudge: false);
+  }
+
+  Future<void> _searchPlace(String query) async {
+    if (query.trim().isEmpty || _searching) return;
+    setState(() => _searching = true);
+    final hits = await GeocodeService().search(query);
+    if (!mounted) return;
+    setState(() => _searching = false);
+    if (hits.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No match for that place.')),
+      );
+      return;
+    }
+    if (hits.length == 1) {
+      final hit = hits.first;
+      await _applySearch(hit.latitude, hit.longitude, hit.label);
+      return;
+    }
+    final picked = await showDialog<GeocodeHit>(
+      context: context,
+      builder: (dialogContext) => SimpleDialog(
+        title: const Text('Which place?'),
+        children: [
+          for (final hit in hits)
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(dialogContext).pop(hit),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Text(hit.detail),
+              ),
+            ),
+        ],
+      ),
+    );
+    if (picked != null && mounted) {
+      await _applySearch(picked.latitude, picked.longitude, picked.label);
     }
   }
 
@@ -148,8 +208,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final now = DateTime.now();
     final name = profiles.profile.displayName.trim();
     final weather = quests.device.weather;
-    final lat = quests.device.latitude;
-    final lng = quests.device.longitude;
+    final deviceLat = quests.device.latitude;
+    final deviceLng = quests.device.longitude;
+    final lat = quests.searchLat ?? deviceLat;
+    final lng = quests.searchLon ?? deviceLng;
+    final away = quests.searchingElsewhere;
 
     if (quests.loading && quests.quests.isEmpty) {
       return Center(
@@ -207,19 +270,59 @@ class _HomeScreenState extends State<HomeScreen> {
               tempUnit: profiles.profile.tempUnit,
             ).enter(context, delayMs: 180),
           ],
+          const SizedBox(height: 20),
+          SectionHeader(
+            title: away ? 'Over there' : 'Around you',
+            note: away ? 'tap map or search' : 'tap map or search',
+          ).enter(context, delayMs: 200),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _search,
+            textInputAction: TextInputAction.search,
+            decoration: InputDecoration(
+              hintText: 'Enter location: Seattle, Bellevue, Seatac…',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _searching
+                  ? const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  : null,
+              border: const OutlineInputBorder(),
+            ),
+            onSubmitted: _searchPlace,
+          ),
+          if (away) ...[
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: InputChip(
+                label: Text('Near ${quests.searchLabel}'),
+                onDeleted: _clearSearch,
+              ),
+            ),
+          ],
           if (lat != null && lng != null) ...[
-            const SizedBox(height: 20),
-            const SectionHeader(title: 'Around you')
-                .enter(context, delayMs: 200),
             const SizedBox(height: 12),
             QuestMap(
+              key: ValueKey('map-$lat-$lng'),
               center: LatLng(lat, lng),
               pins: pinsForQuests(
                 lat,
                 lng,
                 quests.quests.map((q) => q.quest).toList(),
               ),
+              userPoint: deviceLat != null && deviceLng != null
+                  ? LatLng(deviceLat, deviceLng)
+                  : null,
+              searchPoint: away ? LatLng(lat, lng) : null,
               onPinTap: _openPin,
+              onMapTap: (point) =>
+                  _applySearch(point.latitude, point.longitude, 'dropped pin'),
               height: 190,
             ).enter(context, delayMs: 220),
           ],
@@ -295,7 +398,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           Text(
             'Sidequests needs location and internet for live ideas. '
-            'Pull to refresh to try again.',
+            'Pull to refresh, or search another spot above.',
             style: text.bodyMedium,
             textAlign: TextAlign.center,
           ),

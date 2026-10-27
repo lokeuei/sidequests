@@ -11,7 +11,9 @@ class QuestMap extends StatelessWidget {
     required this.center,
     required this.pins,
     this.userPoint,
+    this.searchPoint,
     this.onPinTap,
+    this.onMapTap,
     this.height = 200,
     this.zoom = 14,
   });
@@ -22,8 +24,14 @@ class QuestMap extends StatelessWidget {
   /// Where the user dot goes. Defaults to the center.
   final LatLng? userPoint;
 
+  /// Dropped search pin. Null hides it.
+  final LatLng? searchPoint;
+
   /// Fires with the tapped pin. Null leaves pins still.
   final void Function(MapPin pin)? onPinTap;
+
+  /// Fires with the tapped map point. Null leaves the map still.
+  final void Function(LatLng point)? onMapTap;
   final double height;
   final double zoom;
 
@@ -43,6 +51,7 @@ class QuestMap extends StatelessWidget {
               options: MapOptions(
                 initialCenter: center,
                 initialZoom: zoom,
+                onTap: onMapTap == null ? null : (_, point) => onMapTap!(point),
               ),
               children: [
                 TileLayer(
@@ -76,6 +85,27 @@ class QuestMap extends StatelessWidget {
                           ),
                         ),
                       ),
+                    if (searchPoint != null)
+                      Marker(
+                        point: searchPoint!,
+                        width: 44,
+                        height: 44,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: scheme.tertiary,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: scheme.surface,
+                              width: 2.5,
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.search,
+                            color: scheme.onTertiary,
+                            size: 22,
+                          ),
+                        ),
+                      ),
                     Marker(
                       point: userPoint ?? center,
                       width: 22,
@@ -99,7 +129,9 @@ class QuestMap extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'Map data: OpenStreetMap contributors.',
+          onMapTap == null
+              ? 'Map data: OpenStreetMap contributors.'
+              : 'Tap the map to search there. Map: OpenStreetMap.',
           style: text.bodySmall?.copyWith(
             color: scheme.onSurface.withValues(alpha: 0.6),
           ),
