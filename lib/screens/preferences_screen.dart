@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sidequests/models/quest.dart';
 import 'package:sidequests/models/user_profile.dart';
 import 'package:sidequests/screens/quest_detail_screen.dart';
 import 'package:sidequests/services/nudge_scheduler.dart';
