@@ -22,6 +22,11 @@ AI that reconnects you with the real world instead of pulling you away from it.
   weather block with hourly and daily rows.
 - **Live places**: real nearby spots from OpenStreetMap when online, samples
   when not. The list header tells you which.
+- **Background nudges**: a periodic check sends a golden-hour nudge even with
+  the app closed. Quiet hours are 10 PM to 8 AM.
+- **Spoken cues**: turn on Audio cues and the system voice reads nudges aloud.
+- **Events (needs key)**: Ticketmaster gigs near you when you pass a free API
+  key. See the setup guide.
 - **You tab**: name, interests ("love" / "less of"), nudge style, travel mode,
   saved quests, and a reset. By default Muse learns from taps, saves,
   dismissals, and "Let's go" presses. Explicit settings improve its picks.

@@ -16,6 +16,7 @@ Everything the skill may use, where it comes from, and what it costs.
 | Home anchor | Not learned yet; manual toggle only | n/a | None |
 | App events | view/save/go/unsave/dismiss with tag deltas | Immediate | None |
 | Explicit profile | love/avoid lists, nudge style, toggles | Immediate | None |
+| Events | Ticketmaster, needs free API key | On refresh, 15 s timeout | One HTTPS GET |
 
 ## Not yet wired (roadmap)
 

@@ -85,6 +85,18 @@ flutter build apk --release
 adb install build\app\outputs\flutter-apk\app-release.apk
 ```
 
+## 7. Events key (optional)
+
+Gigs and shows come from Ticketmaster, which needs a free key:
+
+1. Sign up at <https://developer.ticketmaster.com> and make an app to get
+   a consumer key (called the API key on their site).
+2. Run with the key baked in:
+```powershell
+flutter run --dart-define=TICKETMASTER_KEY=your_key_here
+```
+Without the key the app simply skips events. Everything else works.
+
 ## Troubleshooting
 
 | Symptom | Fix |
