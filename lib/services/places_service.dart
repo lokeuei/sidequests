@@ -91,39 +91,39 @@ _Kind? _kindOf(Map tags) {
   final historic = value('historic');
 
   if (tourism == 'viewpoint') {
-    return _Kind(QuestCategory.outdoors, ['viewpoints', 'outdoors', 'evenings'],
+    return const _Kind(QuestCategory.outdoors, ['viewpoints', 'outdoors', 'evenings'],
         'A view worth the walk.', 'The view does the work.', 'Sunset');
   }
   if (tourism == 'museum' || tourism == 'gallery') {
-    return _Kind(QuestCategory.culture, ['museums', 'history', 'quiet'],
+    return const _Kind(QuestCategory.culture, ['museums', 'history', 'quiet'],
         'Worth an hour inside.', 'Someone curated this for you.', 'Anytime');
   }
   if (tourism == 'attraction') {
-    return _Kind(QuestCategory.culture, ['local gems', 'history'],
+    return const _Kind(QuestCategory.culture, ['local gems', 'history'],
         'People come here on purpose.', 'Worth seeing once.', 'Anytime');
   }
   if (tourism == 'artwork') {
-    return _Kind(QuestCategory.culture, ['street art', 'local gems'],
+    return const _Kind(QuestCategory.culture, ['street art', 'local gems'],
         'Public art, free to see.', 'It changes the street.', 'Daylight');
   }
   if (leisure == 'park' || leisure == 'garden') {
-    return _Kind(QuestCategory.quiet, ['quiet', 'outdoors', 'mornings'],
+    return const _Kind(QuestCategory.quiet, ['quiet', 'outdoors', 'mornings'],
         'Green space, free entry.', 'The city is loud. Parks are not.', 'Mornings');
   }
   if (leisure == 'nature_reserve') {
-    return _Kind(QuestCategory.outdoors, ['outdoors', 'quiet'],
+    return const _Kind(QuestCategory.outdoors, ['outdoors', 'quiet'],
         'Wild edges close to home.', 'Proper quiet.', 'Daylight');
   }
   if (amenity == 'marketplace') {
-    return _Kind(QuestCategory.food, ['food markets', 'social'],
+    return const _Kind(QuestCategory.food, ['food markets', 'social'],
         'Stalls, snacks, and noise.', 'Go hungry.', 'Weekends');
   }
   if (amenity == 'cafe') {
-    return _Kind(QuestCategory.food, ['cafes', 'mornings'],
+    return const _Kind(QuestCategory.food, ['cafes', 'mornings'],
         'Good coffee near you.', 'Worth the detour.', 'Mornings');
   }
   if (historic.isNotEmpty) {
-    return _Kind(QuestCategory.culture, ['history', 'architecture', 'local gems'],
+    return const _Kind(QuestCategory.culture, ['history', 'architecture', 'local gems'],
         'Older than everything around it.', 'Built before everything around it.', 'Anytime');
   }
   return null;
