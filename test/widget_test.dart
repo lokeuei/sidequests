@@ -10,6 +10,7 @@ import 'package:sidequests/state/profile_provider.dart';
 import 'package:sidequests/state/quest_provider.dart';
 import 'package:sidequests/theme/app_theme.dart';
 import 'package:sidequests/widgets/quest_card.dart';
+import 'package:sidequests/widgets/weather_card.dart';
 
 void main() {
   testWidgets('home shows greeting and quest cards', (tester) async {
@@ -34,6 +35,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('greeting')), findsOneWidget);
+    expect(find.byType(WeatherCard), findsOneWidget);
+    // Cards sit below the weather block, so scroll the outer list
+    // until the lazy ListView builds them.
+    await tester.scrollUntilVisible(
+      find.byType(QuestCard),
+      400,
+      scrollable: find.byType(ListView).first,
+    );
+    await tester.pumpAndSettle();
     expect(find.byType(QuestCard), findsWidgets);
   });
 }
