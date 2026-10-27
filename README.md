@@ -23,9 +23,10 @@ AI that reconnects you with the real world instead of pulling you away from it.
   its picks.
 - **Travel mode**: when you're >80 km from home (or toggle it manually),
   rankings lean into local gems. Muse can suggest turning it on.
-- **Muse picks**: with a Meta Model API key the app sends Muse the date,
-  time, weather, your prefs, and the live list, and Muse ranks it. Without a
-  key the local ranker covers, using the same contract in `muse-skill/`.
+- **Muse picks**: paste a Meta Model API key once in the You tab and the app
+  sends Muse the date, time, weather, your prefs, and the live list, and Muse
+  ranks it. Without a key the local ranker covers, using the same contract in
+  `muse-skill/`.
 - **Painted cover art**: every quest gets in-code cover art, no downloads.
 - **Maps + weather**: OpenStreetMap pins around you (no API key) and a classic
   weather block with hourly and daily rows. Pins open quest details on tap.
@@ -33,8 +34,8 @@ AI that reconnects you with the real world instead of pulling you away from it.
   Ticketmaster with a free key, no samples anywhere.
 - **Background nudges**: a periodic check sends a golden-hour nudge even with
   the app closed. Quiet hours are 10 PM to 8 AM.
-- **Events (needs key)**: Ticketmaster gigs near you when you pass a free API
-  key. See the setup guide.
+- **Events (needs key)**: Ticketmaster gigs near you once you paste a free API
+  key in the You tab. See the setup guide.
 
 ## Quickstart
 
@@ -48,7 +49,8 @@ flutter pub get
 flutter run                                # pick your Pixel 9
 ```
 
-With live gigs and Muse picks:
+Keys go in the You tab on the phone, no flags needed. Builders can also bake
+them in:
 
 ```sh
 flutter run --dart-define=TICKETMASTER_KEY=your_key \
@@ -100,7 +102,6 @@ same ranked shape, so the UI never changes.
 
 ## Roadmap
 
-- Muse key entry in the You tab (no rebuild needed)
 - iOS shell polish + TestFlight (`flutter create` already scaffolds it)
 - Release build with signing, store listing, screenshots
 - Opening hours + sunset countdown per quest

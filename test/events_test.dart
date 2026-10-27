@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:sidequests/models/quest.dart';
 import 'package:sidequests/services/events_service.dart';
 
@@ -46,5 +50,48 @@ void main() {
   test('no key means no events and no network', () async {
     final service = EventsService();
     expect(await service.upcoming(59.9, 10.7), isEmpty);
+  });
+
+  test('stored key fetches events', () async {
+    final start = DateTime.now()
+        .toUtc()
+        .add(const Duration(days: 3))
+        .toIso8601String();
+    final body = jsonEncode({
+      '_embedded': {
+        'events': [
+          {
+            'id': '9',
+            'name': 'Riverside Gig',
+            'dates': {
+              'start': {'dateTime': start},
+            },
+            'classifications': [
+              {
+                'segment': {'name': 'Music'},
+              },
+            ],
+            '_embedded': {
+              'venues': [
+                {
+                  'name': 'Pier Hall',
+                  'location': {'latitude': '59.901', 'longitude': '10.701'},
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+    String? seenKey;
+    final client = MockClient((request) async {
+      seenKey = request.url.queryParameters['apikey'];
+      return http.Response(body, 200);
+    });
+    final quests =
+        await EventsService().upcoming(59.9, 10.7, apiKey: 'tm-key', client: client);
+    expect(seenKey, 'tm-key');
+    expect(quests.length, 1);
+    expect(quests.first.title, 'Riverside Gig');
   });
 }

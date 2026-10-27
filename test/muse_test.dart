@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:sidequests/models/user_profile.dart';
 import 'package:sidequests/models/weather.dart';
 import 'package:sidequests/services/muse_brain.dart';
@@ -88,5 +90,40 @@ void main() {
       ),
       isNull,
     );
+  });
+
+  test('stored key is sent and the reply is ranked', () async {
+    String? seenAuth;
+    final client = MockClient((request) async {
+      seenAuth = request.headers['Authorization'];
+      return http.Response(
+        museReply(
+          picks: [
+            {'id': 'q-small-museum', 'reason': 'Rain is coming, go inside.'},
+          ],
+          reasoning: 'Rain outside',
+        ),
+        200,
+      );
+    });
+    final suggestion = await MuseBrain().suggest(
+      profile: UserProfile(),
+      now: DateTime(2026, 10, 27, 18),
+      traveling: false,
+      weather: null,
+      candidates: questCatalog,
+      apiKey: 'runtime-key',
+      client: client,
+    );
+    expect(seenAuth, 'Bearer runtime-key');
+    expect(suggestion, isNotNull);
+    expect(suggestion!.picks.first.quest.id, 'q-small-museum');
+  });
+
+  test('api keys survive a profile round trip', () {
+    final profile = UserProfile(museApiKey: 'm1', ticketmasterKey: 't1');
+    final back = UserProfile.fromJson(profile.toJson());
+    expect(back.museApiKey, 'm1');
+    expect(back.ticketmasterKey, 't1');
   });
 }

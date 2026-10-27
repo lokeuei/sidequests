@@ -16,6 +16,8 @@ class UserProfile {
     this.travelMode = false,
     this.skillEnabled = true,
     this.suggestWhenTraveling = true,
+    this.museApiKey = '',
+    this.ticketmasterKey = '',
     Map<String, int>? learnedWeights,
   })  : interests = interests ?? <String>{},
         avoid = avoid ?? <String>{},
@@ -36,6 +38,10 @@ class UserProfile {
   bool travelMode;
   bool skillEnabled;
   bool suggestWhenTraveling;
+
+  /// API keys, stored only on this phone. A --dart-define key wins when set.
+  String museApiKey;
+  String ticketmasterKey;
 
   /// Tag -> weight. Positive means "more like this". Mirrors the skill
   /// contract deltas: view +1, save +2, go +3, unsave -1, dismiss -2.
@@ -62,6 +68,8 @@ class UserProfile {
         'travelMode': travelMode,
         'skillEnabled': skillEnabled,
         'suggestWhenTraveling': suggestWhenTraveling,
+        'museApiKey': museApiKey,
+        'ticketmasterKey': ticketmasterKey,
         'learnedWeights': learnedWeights,
       };
 
@@ -107,6 +115,8 @@ class UserProfile {
       travelMode: json['travelMode'] as bool? ?? false,
       skillEnabled: json['skillEnabled'] as bool? ?? true,
       suggestWhenTraveling: json['suggestWhenTraveling'] as bool? ?? true,
+      museApiKey: json['museApiKey'] as String? ?? '',
+      ticketmasterKey: json['ticketmasterKey'] as String? ?? '',
       learnedWeights: weights(json['learnedWeights']),
     );
   }

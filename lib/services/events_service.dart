@@ -5,13 +5,22 @@ import 'package:http/http.dart' as http;
 import 'package:sidequests/models/quest.dart';
 import 'package:sidequests/models/weather.dart';
 
-/// Ticketmaster events near the user. Needs a free key passed as
-/// --dart-define=TICKETMASTER_KEY=.... Without a key it returns [] and
+/// Ticketmaster events near the user. Pass the free key in, or bake it in
+/// with --dart-define=TICKETMASTER_KEY=.... Without a key it returns [] and
 /// the app simply ranks places.
 class EventsService {
-  Future<List<Quest>> upcoming(double latitude, double longitude) async {
-    const key = String.fromEnvironment('TICKETMASTER_KEY');
+  Future<List<Quest>> upcoming(
+    double latitude,
+    double longitude, {
+    String? apiKey,
+    http.Client? client,
+  }) async {
+    const envKey = String.fromEnvironment('TICKETMASTER_KEY');
+    final key = envKey.isNotEmpty
+        ? envKey
+        : (apiKey != null && apiKey.trim().isNotEmpty ? apiKey.trim() : '');
     if (key.isEmpty) return [];
+    final httpClient = client ?? http.Client();
     try {
       final now = DateTime.now().toUtc().toIso8601String();
       final uri = Uri.parse(
@@ -19,11 +28,14 @@ class EventsService {
         '?apikey=$key&latlong=$latitude,$longitude&radius=25&unit=km'
         '&size=20&sort=date,asc&startDateTime=$now',
       );
-      final response = await http.get(uri).timeout(const Duration(seconds: 15));
+      final response =
+          await httpClient.get(uri).timeout(const Duration(seconds: 15));
       if (response.statusCode != 200) return [];
       return parseTicketmaster(response.body, DateTime.now(), latitude, longitude);
     } catch (_) {
       return [];
+    } finally {
+      if (client == null) httpClient.close();
     }
   }
 }

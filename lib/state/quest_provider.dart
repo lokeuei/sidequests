@@ -62,6 +62,7 @@ class QuestProvider extends ChangeNotifier {
         final gigs = await events.upcoming(
           device.latitude!,
           device.longitude!,
+          apiKey: profile.ticketmasterKey,
         );
         final live = [...found, ...gigs];
         if (live.isNotEmpty) {
@@ -83,6 +84,7 @@ class QuestProvider extends ChangeNotifier {
           traveling: context.traveling,
           weather: device.weather,
           candidates: candidates,
+          apiKey: profile.museApiKey,
         );
         final picks = suggestion?.picks
                 .where((q) => !_dismissed.contains(q.quest.id))

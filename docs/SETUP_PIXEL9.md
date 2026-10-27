@@ -91,11 +91,11 @@ Gigs and shows come from Ticketmaster, which needs a free key:
 
 1. Sign up at <https://developer.ticketmaster.com> and make an app to get
    a consumer key (called the API key on their site).
-2. Run with the key baked in:
-```powershell
-flutter run --dart-define=TICKETMASTER_KEY=your_key_here
-```
+2. Paste it into the You tab under Keys. It stays on your phone.
+
 Without the key the app simply skips events. Everything else works.
+Builders can also bake it in with
+`flutter run --dart-define=TICKETMASTER_KEY=your_key_here`.
 
 ## 8. Muse key (optional)
 
@@ -103,16 +103,14 @@ Muse ranking needs a Meta Model API key:
 
 1. Sign up in the Meta Developer Console (linked from the Meta Model API
    docs) and create a key. New accounts get free credits to start.
-2. Run with the key baked in:
-```powershell
-flutter run --dart-define=MUSE_API_KEY=your_key_here
-```
+2. Paste it into the You tab under Keys. It stays on your phone.
 3. Optional: pick the model with `--dart-define=MUSE_MODEL=muse-spark-1.1`
    (Spark) or the Wonder id shown in the console. The default is Spark 1.1.
 
 Without the key the app ranks with the built-in local ranker. Note the API
 is in preview and may be limited by region; if the call fails the app falls
-back to local ranking on its own.
+back to local ranking on its own. Builders can also bake the key in with
+`flutter run --dart-define=MUSE_API_KEY=your_key_here`.
 
 ## Troubleshooting
 

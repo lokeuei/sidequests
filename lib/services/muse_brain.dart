@@ -6,9 +6,10 @@ import 'package:sidequests/models/user_profile.dart';
 import 'package:sidequests/models/weather.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 
-/// Asks Muse to rank live candidates. Needs a Meta Model API key passed as
-/// --dart-define=MUSE_API_KEY=.... Returns null without a key or on any
-/// failure, and the app falls back to the local ranker.
+/// Asks Muse to rank live candidates. Takes the key in (stored in the
+/// profile), or bake one in with --dart-define=MUSE_API_KEY=.... Returns
+/// null without a key or on any failure, and the app falls back to the
+/// local ranker.
 class MuseBrain {
   Future<MuseSuggestion?> suggest({
     required UserProfile profile,
@@ -16,12 +17,18 @@ class MuseBrain {
     required bool traveling,
     required WeatherInfo? weather,
     required List<Quest> candidates,
+    String? apiKey,
+    http.Client? client,
   }) async {
-    const key = String.fromEnvironment('MUSE_API_KEY');
+    const envKey = String.fromEnvironment('MUSE_API_KEY');
     const model = String.fromEnvironment('MUSE_MODEL', defaultValue: 'muse-spark-1.1');
+    final key = envKey.isNotEmpty
+        ? envKey
+        : (apiKey != null && apiKey.trim().isNotEmpty ? apiKey.trim() : '');
     if (key.isEmpty || candidates.isEmpty) return null;
+    final httpClient = client ?? http.Client();
     try {
-      final response = await http
+      final response = await httpClient
           .post(
             Uri.parse('https://api.meta.ai/v1/chat/completions'),
             headers: {
@@ -51,6 +58,8 @@ class MuseBrain {
       return parseMuseResponse(response.body, candidates);
     } catch (_) {
       return null;
+    } finally {
+      if (client == null) httpClient.close();
     }
   }
 }

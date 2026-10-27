@@ -18,18 +18,23 @@ class PreferencesScreen extends StatefulWidget {
 
 class _PreferencesScreenState extends State<PreferencesScreen> {
   late final TextEditingController _name;
+  late final TextEditingController _museKey;
+  late final TextEditingController _eventsKey;
 
   @override
   void initState() {
     super.initState();
-    _name = TextEditingController(
-      text: context.read<ProfileProvider>().profile.displayName,
-    );
+    final profile = context.read<ProfileProvider>().profile;
+    _name = TextEditingController(text: profile.displayName);
+    _museKey = TextEditingController(text: profile.museApiKey);
+    _eventsKey = TextEditingController(text: profile.ticketmasterKey);
   }
 
   @override
   void dispose() {
     _name.dispose();
+    _museKey.dispose();
+    _eventsKey.dispose();
     super.dispose();
   }
 
@@ -185,6 +190,48 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           ),
         ),
         const SizedBox(height: 20),
+        const SectionHeader(title: 'Keys', note: 'stored on this phone only'),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _museKey,
+          obscureText: true,
+          enableSuggestions: false,
+          autocorrect: false,
+          decoration: const InputDecoration(
+            labelText: 'Muse key',
+            hintText: 'Lets Muse rank your quests',
+            border: OutlineInputBorder(),
+          ),
+          onSubmitted: (value) async {
+            await profiles.update((p) => p.museApiKey = value.trim());
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Muse key saved.')),
+              );
+            }
+          },
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _eventsKey,
+          obscureText: true,
+          enableSuggestions: false,
+          autocorrect: false,
+          decoration: const InputDecoration(
+            labelText: 'Ticketmaster key',
+            hintText: 'Shows gigs near you',
+            border: OutlineInputBorder(),
+          ),
+          onSubmitted: (value) async {
+            await profiles.update((p) => p.ticketmasterKey = value.trim());
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Ticketmaster key saved.')),
+              );
+            }
+          },
+        ),
+        const SizedBox(height: 20),
         const SectionHeader(title: 'How learning works'),
         const SizedBox(height: 8),
         _learnRow(context, Icons.favorite_border, 'Save what you love. Muse notices.'),
@@ -267,7 +314,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
       builder: (dialogContext) => AlertDialog(
         title: const Text('Reset everything?'),
         content: const Text(
-          'This clears your name, interests, saved quests, '
+          'This clears your name, interests, saved quests, keys, '
           'and everything Muse learned.',
         ),
         actions: [
@@ -285,6 +332,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     if (confirmed == true) {
       await profiles.reset();
       _name.clear();
+      _museKey.clear();
+      _eventsKey.clear();
     }
   }
 }
