@@ -1,3 +1,6 @@
+// ignore_for_file: avoid_print
+// Per-endpoint outcomes print to the dev console so phone failures
+// (blocked hosts, bad status) can be diagnosed from `flutter run` output.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
