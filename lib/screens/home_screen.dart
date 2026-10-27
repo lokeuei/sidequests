@@ -1008,7 +1008,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text('Muse', style: text.displayMedium),
                   const SizedBox(height: 2),
                   Text(
-                    'Your taste, in one place. Muse ranks with this.',
+                    'Jolly here. Your taste, in one place.',
                     style: text.bodyMedium,
                   ),
                 ],
