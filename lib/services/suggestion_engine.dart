@@ -185,3 +185,14 @@ List<ScoredQuest> rankQuests({
   scored.sort((a, b) => b.score.compareTo(a.score));
   return scored.take(limit).toList();
 }
+
+/// Spoken brief of the top picks. Plain words, short enough to say aloud.
+String buildBrief(List<ScoredQuest> top) {
+  if (top.isEmpty) return 'Nothing to brief yet.';
+  const ordinals = ['First', 'Second', 'Third'];
+  final bits = <String>[];
+  for (var i = 0; i < top.length && i < 3; i++) {
+    bits.add('${ordinals[i]}, ${top[i].quest.title}. ${top[i].reason}');
+  }
+  return "Here's your brief. ${bits.join(' ')}";
+}

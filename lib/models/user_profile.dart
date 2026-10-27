@@ -44,7 +44,8 @@ class UserProfile {
   String ticketmasterKey;
 
   /// Tag -> weight. Positive means "more like this". Mirrors the skill
-  /// contract deltas: view +1, save +2, go +3, unsave -1, dismiss -2.
+  /// contract deltas: view +1, save +2, go +3, unsave -1, dismiss -2,
+  /// went +3, loved +5, not for me -4.
   Map<String, int> learnedWeights;
 
   bool isSaved(String id) => savedQuests.any((q) => q.id == id);
@@ -53,6 +54,27 @@ class UserProfile {
     for (final tag in tags) {
       learnedWeights[tag] = (learnedWeights[tag] ?? 0) + delta;
     }
+  }
+
+  /// After-quest feedback, stronger than taps.
+  void noteWent(Quest quest) => noteEngagement(quest.tags, 3);
+  void noteLoved(Quest quest) => noteEngagement(quest.tags, 5);
+  void noteNotForMe(Quest quest) => noteEngagement(quest.tags, -4);
+
+  /// Tags Muse noticed you love (weight > 0), best first.
+  List<String> topLearned([int limit = 5]) {
+    final entries =
+        learnedWeights.entries.where((e) => e.value > 0).toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+    return entries.take(limit).map((e) => e.key).toList();
+  }
+
+  /// Tags Muse noticed you skip (weight < 0), worst first.
+  List<String> topSkipped([int limit = 3]) {
+    final entries =
+        learnedWeights.entries.where((e) => e.value < 0).toList()
+          ..sort((a, b) => a.value.compareTo(b.value));
+    return entries.take(limit).map((e) => e.key).toList();
   }
 
   int weightFor(String tag) => learnedWeights[tag] ?? 0;

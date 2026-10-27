@@ -372,12 +372,30 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             }),
           const SizedBox(height: 8),
-          Center(
-            child: FilledButton.tonalIcon(
-              onPressed: quests.quests.isEmpty ? null : () => quests.shuffle(),
-              icon: const Icon(Icons.shuffle),
-              label: const Text('Surprise me'),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FilledButton.tonalIcon(
+                onPressed: quests.quests.isEmpty
+                    ? null
+                    : () async {
+                        final message = await quests.brief();
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(message)),
+                        );
+                      },
+                icon: const Icon(Icons.campaign),
+                label: const Text('Brief me'),
+              ),
+              const SizedBox(width: 12),
+              FilledButton.tonalIcon(
+                onPressed:
+                    quests.quests.isEmpty ? null : () => quests.shuffle(),
+                icon: const Icon(Icons.shuffle),
+                label: const Text('Surprise me'),
+              ),
+            ],
           ).enter(context, delayMs: 320),
         ],
       ),

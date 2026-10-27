@@ -242,6 +242,31 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           'Press "Let\'s go". It learns fastest.',
         ),
         const SizedBox(height: 20),
+        const SectionHeader(
+          title: 'What Muse knows',
+          note: 'updates as you tap',
+        ),
+        const SizedBox(height: 8),
+        if (profile.topLearned().isEmpty && profile.topSkipped().isEmpty)
+          Text(
+            'Nothing noticed yet. Open, save, or dismiss ideas and check back.',
+            style: text.bodyMedium,
+          )
+        else ...[
+          if (profile.topLearned().isNotEmpty)
+            _learnRow(
+              context,
+              Icons.favorite_border,
+              'Loves ${profile.topLearned().join(', ')}.',
+            ),
+          if (profile.topSkipped().isNotEmpty)
+            _learnRow(
+              context,
+              Icons.close,
+              'Skips ${profile.topSkipped().join(', ')}.',
+            ),
+        ],
+        const SizedBox(height: 20),
         SectionHeader(title: 'Saved', note: '${saved.length}'),
         const SizedBox(height: 8),
         if (saved.isEmpty)

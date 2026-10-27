@@ -32,6 +32,11 @@ AI that reconnects you with the real world instead of pulling you away from it.
   weather block with hourly and daily rows. Pins open quest details on tap.
 - **Look elsewhere**: tap the map or type a place ("Bellevue", "Seatac") to
   search around that point instead of your GPS spot. Clear the chip to come back.
+- **Visible learning**: the You tab shows what Muse noticed you love and skip.
+- **Feedback**: each quest asks how it went. Went, loved it, not for me.
+- **Proactive nudges**: loved-genre gig alerts and weekend ideas, plus golden
+  hour, all with quiet hours and no repeats.
+- **Brief me**: one tap reads your top three out loud.
 - **Live data only**: real nearby spots from OpenStreetMap, gigs from
   Ticketmaster with a free key, no samples anywhere.
 - **Background nudges**: a periodic check sends a golden-hour nudge even with

@@ -64,6 +64,9 @@ but MUST keep the same output shape and the "two contributors" reason style.
 | "Let's go" pressed | +3 |
 | Quest unsaved | −1 |
 | Quest dismissed ("Not now") | −2 |
+| "I went" feedback | +3 |
+| "Loved it" feedback | +5 |
+| "Not for me" feedback | −4 |
 
 Weights never expire in v1. Explicit avoid always wins over positive weight
 at rank time via the −25 penalty.

@@ -190,6 +190,14 @@ class QuestProvider extends ChangeNotifier {
     );
   }
 
+  /// Reads the top three out loud. Explicit tap, so it ignores the
+  /// audio-cues setting.
+  Future<String> brief() async {
+    if (quests.isEmpty) return 'Nothing to brief yet.';
+    await notifications.speak(buildBrief(quests.take(3).toList()));
+    return 'Speaking your brief.';
+  }
+
   void setSearchPoint(double lat, double lon, String label) {
     searchLat = lat;
     searchLon = lon;

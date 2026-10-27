@@ -6,6 +6,7 @@ import 'package:sidequests/services/context_service.dart';
 import 'package:sidequests/services/events_service.dart';
 import 'package:sidequests/services/notification_service.dart';
 import 'package:sidequests/services/places_service.dart';
+import 'package:sidequests/services/suggestion_engine.dart';
 import 'package:sidequests/state/quest_provider.dart';
 
 class _FakeContext extends ContextService {
@@ -126,5 +127,21 @@ void main() {
     expect(seen, contains('Looking around…'));
     expect(seen, isNot(contains('Asking Muse…')));
     expect(quests.loadStatus, isEmpty);
+  });
+
+  test('brief speaks when quests exist', () async {
+    final places = _RecordingPlaces();
+    final events = _RecordingEvents()..items = [_gig];
+    final quests = _provider(places, events);
+    await quests.refresh(UserProfile(), autoNudge: false);
+    expect(await quests.brief(), 'Speaking your brief.');
+  });
+
+  test('brief text names three in order', () {
+    final text = buildBrief([
+      const ScoredQuest(quest: _gig, score: 90, reason: 'On Saturday.'),
+    ]);
+    expect(text, "Here's your brief. First, Riverside Gig. On Saturday.");
+    expect(buildBrief([]), 'Nothing to brief yet.');
   });
 }

@@ -169,6 +169,55 @@ class QuestDetailScreen extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 18),
+          Text('How was it?', style: text.titleMedium),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                await profiles.update((p) => p.noteWent(quest));
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Nice. Muse logged the visit.')),
+                );
+              },
+              icon: const Icon(Icons.check),
+              label: const Text('I went'),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                await profiles.update((p) => p.noteLoved(quest));
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Loved. Muse will find more.'),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.favorite),
+              label: const Text('Loved it'),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                await profiles.update((p) => p.noteNotForMe(quest));
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Noted. Less of that.')),
+                );
+              },
+              icon: const Icon(Icons.thumb_down),
+              label: const Text('Not for me'),
+            ),
+          ),
         ],
       ),
     );
