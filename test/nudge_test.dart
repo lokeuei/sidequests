@@ -84,7 +84,7 @@ void main() {
       category: QuestCategory.social,
       minutes: 120,
       meters: 500,
-      tags: const ['events', 'live music'],
+      tags: ['events', 'live music'],
       why: 'Soon.',
       bestWindow: 'Soon',
       startsAt: '',
