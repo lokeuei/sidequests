@@ -8,7 +8,7 @@ Everything the skill may use, where it comes from, and what it costs.
 |---|---|---|---|
 | Location (lat/lng) | Geolocator, `medium` accuracy, 8 s timeout | On refresh only | Low; runtime permission |
 | Place label | Stub (`Nearby` / `Somewhere new` / `Your neighborhood`) | n/a | None (no reverse-geocode yet) |
-| Temperature + WMO code | Open-Meteo `current=temperature_2m,weather_code`, keyless | On refresh, 8 s timeout | One HTTPS GET |
+| Temperature + WMO code | Open-Meteo current + hourly + daily, keyless | On refresh, 8 s timeout | One HTTPS GET |
 | Time of day / weekday | Device clock | Always | None |
 | Travel heuristic | >80 km from home anchor via `distanceBetween` | On refresh | None (computed) |
 | Home anchor | Not learned yet; manual toggle only | n/a | None |

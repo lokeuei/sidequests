@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:sidequests/models/weather.dart';
 
 /// Automatic signals: where the user is, what the sky is doing.
 ///
@@ -13,6 +14,7 @@ class DeviceContext {
     this.placeLabel = 'Your neighborhood',
     this.temperatureC,
     this.weatherCode = -1,
+    this.weather,
     this.traveling = false,
   });
 
@@ -23,6 +25,9 @@ class DeviceContext {
 
   /// Open-Meteo WMO weather code; -1 = unknown.
   final int weatherCode;
+
+  /// Full weather (current + hourly + daily). Null when unknown.
+  final WeatherInfo? weather;
   final bool traveling;
 }
 
@@ -55,8 +60,9 @@ class ContextService {
         latitude: position.latitude,
         longitude: position.longitude,
         placeLabel: traveling ? 'Somewhere new' : 'Nearby',
-        temperatureC: weather.temperatureC,
-        weatherCode: weather.code,
+        temperatureC: weather?.temperatureC,
+        weatherCode: weather?.code ?? -1,
+        weather: weather,
         traveling: traveling,
       );
     } catch (_) {
@@ -64,10 +70,11 @@ class ContextService {
     }
   }
 
-  DeviceContext _stub() => const DeviceContext(
+  DeviceContext _stub() => DeviceContext(
         placeLabel: 'Your neighborhood',
         temperatureC: 19,
         weatherCode: 1,
+        weather: WeatherInfo.sample(),
       );
 
   Future<Position?> _position() async {
@@ -87,27 +94,92 @@ class ContextService {
     );
   }
 
-  /// Keyless current weather from Open-Meteo.
-  Future<({double? temperatureC, int code})> _weather(
-    double latitude,
-    double longitude,
-  ) async {
+  /// Keyless current + hourly + daily weather from Open-Meteo.
+  Future<WeatherInfo?> _weather(double latitude, double longitude) async {
     try {
       final uri = Uri.parse(
         'https://api.open-meteo.com/v1/forecast'
         '?latitude=$latitude&longitude=$longitude'
-        '&current=temperature_2m,weather_code',
+        '&current=temperature_2m,weather_code'
+        '&hourly=temperature_2m,weather_code'
+        '&daily=weather_code,temperature_2m_max,temperature_2m_min'
+        '&forecast_days=5&timezone=auto',
       );
       final response = await http.get(uri).timeout(const Duration(seconds: 8));
-      if (response.statusCode != 200) return (temperatureC: null, code: -1);
+      if (response.statusCode != 200) return null;
       final body = jsonDecode(response.body) as Map<String, dynamic>;
+
       final current = body['current'] as Map<String, dynamic>?;
-      return (
-        temperatureC: (current?['temperature_2m'] as num?)?.toDouble(),
-        code: (current?['weather_code'] as num?)?.toInt() ?? -1,
+      final temp = (current?['temperature_2m'] as num?)?.toDouble();
+      final code = (current?['weather_code'] as num?)?.toInt() ?? -1;
+      if (temp == null) return null;
+
+      final hourly = _parseHourly(body['hourly']);
+      final daily = _parseDaily(body['daily']);
+      return WeatherInfo(
+        temperatureC: temp,
+        code: code,
+        highC: daily.isNotEmpty ? daily.first.maxC : temp,
+        lowC: daily.isNotEmpty ? daily.first.minC : temp,
+        hourly: hourly,
+        daily: daily,
       );
     } catch (_) {
-      return (temperatureC: null, code: -1);
+      return null;
+    }
+  }
+
+  List<HourlyPoint> _parseHourly(Object? json) {
+    try {
+      final map = json as Map<String, dynamic>;
+      final times = (map['time'] as List?) ?? [];
+      final temps = (map['temperature_2m'] as List?) ?? [];
+      final codes = (map['weather_code'] as List?) ?? [];
+      final now = DateTime.now();
+      String two(int n) => n.toString().padLeft(2, '0');
+      final nowIso =
+          '${now.year}-${two(now.month)}-${two(now.day)}T${two(now.hour)}:00';
+
+      var start = times.indexWhere((t) => t.toString().compareTo(nowIso) >= 0);
+      if (start < 0) start = 0;
+      final points = <HourlyPoint>[];
+      for (var i = start; i < times.length && points.length < 8; i++) {
+        final temp = i < temps.length ? (temps[i] as num?)?.toDouble() : null;
+        if (temp == null) continue;
+        points.add(HourlyPoint(
+          timeIso: times[i].toString(),
+          temperatureC: temp,
+          code: i < codes.length ? (codes[i] as num?)?.toInt() ?? -1 : -1,
+        ));
+      }
+      return points;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  List<DailyPoint> _parseDaily(Object? json) {
+    try {
+      final map = json as Map<String, dynamic>;
+      final dates = (map['date'] as List?) ?? (map['time'] as List?) ?? [];
+      final maxes = (map['temperature_2m_max'] as List?) ?? [];
+      final mins = (map['temperature_2m_min'] as List?) ?? [];
+      final codes = (map['weather_code'] as List?) ?? [];
+      final points = <DailyPoint>[];
+      for (var i = 0; i < dates.length && points.length < 5; i++) {
+        final max = i < maxes.length ? (maxes[i] as num?)?.toDouble() : null;
+        final min = i < mins.length ? (mins[i] as num?)?.toDouble() : null;
+        if (max == null || min == null) continue;
+        points.add(DailyPoint(
+          dateIso: dates[i].toString().substring(0, 10),
+          maxC: max,
+          minC: min,
+          code: i < codes.length ? (codes[i] as num?)?.toInt() ?? -1 : -1,
+        ));
+      }
+      return points;
+    } catch (_) {
+      return [];
     }
   }
 }

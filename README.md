@@ -17,6 +17,9 @@ AI that reconnects you with the real world instead of pulling you away from it.
   from Open-Meteo, time of day, and travel detection. No weather API key needed.
 - **Nudges**: local notifications for the top quest; a louder style when
   "Bold" is on. Audio cues ride on the notification sound for now.
+- **Painted cover art**: every quest gets in-code cover art, no downloads.
+- **Maps + weather**: OpenStreetMap pins around you (no API key) and a classic
+  weather block with hourly and daily rows.
 - **You tab**: name, interests ("love" / "less of"), nudge style, travel mode,
   saved quests, and a reset. By default Muse learns from taps, saves,
   dismissals, and "Let's go" presses. Explicit settings improve its picks.

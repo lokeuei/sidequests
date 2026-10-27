@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:sidequests/models/quest.dart';
+import 'package:sidequests/services/map_pins.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 import 'package:sidequests/state/profile_provider.dart';
 import 'package:sidequests/state/quest_provider.dart';
+import 'package:sidequests/widgets/quest_art.dart';
+import 'package:sidequests/widgets/quest_map.dart';
 
 class QuestDetailScreen extends StatelessWidget {
   const QuestDetailScreen({super.key, required this.scored});
@@ -18,12 +22,19 @@ class QuestDetailScreen extends StatelessWidget {
     final profiles = context.watch<ProfileProvider>();
     final quests = context.read<QuestProvider>();
     final saved = profiles.profile.savedQuestIds.contains(quest.id);
+    final lat = quests.device.latitude;
+    final lng = quests.device.longitude;
 
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
         children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(24)),
+            child: QuestArt(category: quest.category, height: 170),
+          ),
+          const SizedBox(height: 14),
           Text(
             '${quest.category.label} · ${quest.bestWindow}',
             style: text.bodySmall?.copyWith(
@@ -39,7 +50,8 @@ class QuestDetailScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: scheme.tertiary.withValues(alpha: 0.16),
-              borderRadius: const BorderRadius.all(Radius.circular(20)),
+              borderRadius:
+                  const BorderRadius.all(Radius.circular(20)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,27 +84,48 @@ class QuestDetailScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: scheme.outline.withValues(alpha: 0.35),
-              ),
-              borderRadius: const BorderRadius.all(Radius.circular(16)),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.map_outlined, color: scheme.primary),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Live maps plug in here. For now, follow your feet.',
-                    style: text.bodyMedium,
-                  ),
+          if (lat != null && lng != null) ...[
+            QuestMap(
+              center: LatLng(lat, lng),
+              pins: [
+                MapPin(
+                  point: previewPin(lat, lng, quest.id, 0),
+                  label: quest.title,
                 ),
               ],
+              height: 220,
+              zoom: 15,
             ),
-          ),
+            const SizedBox(height: 6),
+            Text(
+              'Sample pin near you. Live places come later.',
+              style: text.bodySmall?.copyWith(
+                color: scheme.onSurface.withValues(alpha: 0.65),
+              ),
+            ),
+          ] else
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: scheme.outline.withValues(alpha: 0.35),
+                ),
+                borderRadius:
+                    const BorderRadius.all(Radius.circular(16)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.map_outlined, color: scheme.primary),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Turn on location to see the map.',
+                      style: text.bodyMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           const SizedBox(height: 22),
           SizedBox(
             width: double.infinity,

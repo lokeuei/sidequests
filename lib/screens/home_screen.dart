@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:sidequests/screens/preferences_screen.dart';
 import 'package:sidequests/screens/quest_detail_screen.dart';
+import 'package:sidequests/services/map_pins.dart';
 import 'package:sidequests/services/suggestion_engine.dart';
 import 'package:sidequests/state/profile_provider.dart';
 import 'package:sidequests/state/quest_provider.dart';
 import 'package:sidequests/widgets/context_row.dart';
 import 'package:sidequests/widgets/enter_animation.dart';
 import 'package:sidequests/widgets/quest_card.dart';
+import 'package:sidequests/widgets/quest_map.dart';
 import 'package:sidequests/widgets/section_header.dart';
+import 'package:sidequests/widgets/weather_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -121,6 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final scheme = Theme.of(context).colorScheme;
     final now = DateTime.now();
     final name = profiles.profile.displayName.trim();
+    final weather = quests.device.weather;
+    final lat = quests.device.latitude;
+    final lng = quests.device.longitude;
 
     if (quests.loading && quests.quests.isEmpty) {
       return Center(
@@ -168,9 +175,28 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 12),
             _travelBanner(context),
           ],
+          if (weather != null) ...[
+            const SizedBox(height: 14),
+            WeatherCard(weather: weather).enter(context, delayMs: 180),
+          ],
+          if (lat != null && lng != null) ...[
+            const SizedBox(height: 20),
+            const SectionHeader(title: 'Around you')
+                .enter(context, delayMs: 200),
+            const SizedBox(height: 12),
+            QuestMap(
+              center: LatLng(lat, lng),
+              pins: pinsForQuests(
+                lat,
+                lng,
+                quests.quests.map((q) => q.quest).toList(),
+              ),
+              height: 190,
+            ).enter(context, delayMs: 220),
+          ],
           const SizedBox(height: 20),
           SectionHeader(title: 'Right now', note: '${quests.quests.length} ideas')
-              .enter(context, delayMs: 200),
+              .enter(context, delayMs: 240),
           const SizedBox(height: 12),
           if (quests.quests.isEmpty)
             _emptyState(context)
