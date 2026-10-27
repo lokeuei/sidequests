@@ -64,7 +64,10 @@ class MuseBrain {
       }
       final suggestion = parseMuseResponse(response.body, candidates);
       if (suggestion == null) {
-        print('muse: reply did not parse');
+        final snippet = response.body.length > 600
+            ? response.body.substring(0, 600)
+            : response.body;
+        print('muse: reply did not parse: $snippet');
         return null;
       }
       print('muse: ranked ${suggestion.picks.length} in ${stopwatch.elapsedMilliseconds}ms');
