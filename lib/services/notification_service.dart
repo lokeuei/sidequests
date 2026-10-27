@@ -12,6 +12,8 @@ class NotificationService {
   NotificationService.device() : _memory = false;
   NotificationService.memory() : _memory = true;
 
+  static const defaultRate = 0.5;
+
   final bool _memory;
   FlutterLocalNotificationsPlugin? _plugin;
   FlutterTts? _tts;
@@ -37,7 +39,7 @@ class NotificationService {
     try {
       _tts = FlutterTts();
       await _tts!.setLanguage('en-US');
-      await _tts!.setSpeechRate(0.6);
+      await _tts!.setSpeechRate(defaultRate);
       final engines = await _tts!.getEngines;
       print('voice: engines $engines');
     } catch (_) {
@@ -47,7 +49,12 @@ class NotificationService {
 
   /// Nudge about [quest]. Bold nudges use max importance; gentle ones high.
   /// When [speak] is true the system voice also reads the nudge out loud.
-  Future<void> nudge(Quest quest, {required bool bold, bool speak = false}) async {
+  Future<void> nudge(
+    Quest quest, {
+    required bool bold,
+    bool speak = false,
+    double rate = defaultRate,
+  }) async {
     if (_memory || !_ready || _plugin == null) return;
     try {
       final androidDetails = AndroidNotificationDetails(
@@ -64,7 +71,7 @@ class NotificationService {
         NotificationDetails(android: androidDetails),
         payload: quest.id,
       );
-      if (speak) await this.speak('${quest.title}. ${quest.why}');
+      if (speak) await this.speak('${quest.title}. ${quest.why}', rate: rate);
     } catch (_) {
       // A missed nudge must never crash the app.
     }
@@ -92,10 +99,11 @@ class NotificationService {
     }
   }
 
-  /// Reads [text] out loud. Silent no-op when voice is unavailable.
-  Future<void> speak(String text) async {
+  /// Reads [text] out loud at [rate]. Silent no-op when voice is missing.
+  Future<void> speak(String text, {double rate = defaultRate}) async {
     if (_memory || _tts == null) return;
     try {
+      await _tts!.setSpeechRate(rate);
       await _tts!.speak(text);
     } catch (_) {}
   }

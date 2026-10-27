@@ -142,9 +142,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _speakBrief() async {
+  Future<void> _speakAction(Future<String> Function() action) async {
     final quests = context.read<QuestProvider>();
-    final message = await quests.brief();
+    final message = await action();
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -566,6 +566,37 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: quests.quests.isEmpty
+                          ? null
+                          : () => _speakAction(
+                                () => quests.brief(profiles.profile),
+                              ),
+                      child: Opacity(
+                        opacity: quests.quests.isEmpty ? 0.4 : 1,
+                        child: Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: scheme.surface,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black
+                                    .withValues(alpha: 0.12),
+                                blurRadius: 12,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.campaign,
+                            color: scheme.onSurface,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 if (away) ...[
@@ -724,6 +755,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: text.titleLarge,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => _speakAction(
+                                () => context
+                                    .read<QuestProvider>()
+                                    .explainQuest(
+                                      quest,
+                                      profiles.profile,
+                                    ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Icon(
+                                  Icons.volume_up,
+                                  color: scheme.onSurface.withValues(
+                                    alpha: 0.5,
+                                  ),
+                                ),
                               ),
                             ),
                             GestureDetector(
@@ -940,6 +990,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   saved: profiles.profile.isSaved(q.quest.id),
                   onTap: () => _openDetail(q),
                   onSave: () => profiles.toggleSave(q.quest),
+                  onExplain: () => _speakAction(
+                    () => quests.explainQuest(
+                      q.quest,
+                      profiles.profile,
+                    ),
+                  ),
                 ),
               );
             }),
@@ -948,8 +1004,11 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FilledButton.tonalIcon(
-                onPressed:
-                    quests.quests.isEmpty ? null : _speakBrief,
+                onPressed: quests.quests.isEmpty
+                    ? null
+                    : () => _speakAction(
+                          () => quests.brief(profiles.profile),
+                        ),
                 icon: const Icon(Icons.campaign),
                 label: const Text('Brief me'),
               ),
@@ -1059,8 +1118,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               FilledButton.tonalIcon(
-                onPressed:
-                    quests.quests.isEmpty ? null : _speakBrief,
+                onPressed: quests.quests.isEmpty
+                    ? null
+                    : () => _speakAction(
+                          () => quests.brief(profiles.profile),
+                        ),
                 icon: const Icon(Icons.campaign),
                 label: const Text('Brief me'),
               ),

@@ -196,3 +196,15 @@ String buildBrief(List<ScoredQuest> top) {
   }
   return "Here's your brief. ${bits.join(' ')}";
 }
+
+/// Spoken deep-dive for one quest. Plain words, short enough to say aloud.
+String buildQuestSpeech(Quest quest) {
+  final bits = [
+    '${quest.title}.',
+    quest.blurb,
+    quest.why,
+    'About ${quest.durationLabel}, ${quest.distanceLabel} away.',
+    'Best ${quest.bestWindow}.',
+  ];
+  return bits.join(' ');
+}

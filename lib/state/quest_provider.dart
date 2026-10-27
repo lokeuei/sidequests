@@ -187,15 +187,28 @@ class QuestProvider extends ChangeNotifier {
       quests.first.quest,
       bold: profile.nudgeStyle == NudgeStyle.bold,
       speak: profile.audioCues,
+      rate: profile.voiceRate,
     );
   }
 
   /// Reads the top three out loud. Explicit tap, so it ignores the
   /// audio-cues setting.
-  Future<String> brief() async {
+  Future<String> brief(UserProfile profile) async {
     if (quests.isEmpty) return 'Nothing to brief yet.';
-    await notifications.speak(buildBrief(quests.take(3).toList()));
+    await notifications.speak(
+      buildBrief(quests.take(3).toList()),
+      rate: profile.voiceRate,
+    );
     return 'Speaking your brief.';
+  }
+
+  /// Reads one quest out loud in more detail.
+  Future<String> explainQuest(Quest quest, UserProfile profile) async {
+    await notifications.speak(
+      buildQuestSpeech(quest),
+      rate: profile.voiceRate,
+    );
+    return 'Mint is explaining it.';
   }
 
   /// Stops brief speech.
@@ -260,4 +273,3 @@ class QuestProvider extends ChangeNotifier {
     return '${lead[0].toUpperCase()}${lead.substring(1)}. A few ideas worth looking up for.';
   }
 }
-

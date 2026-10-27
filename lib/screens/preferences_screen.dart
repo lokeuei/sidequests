@@ -164,6 +164,33 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           value: profile.audioCues,
           onChanged: (value) => profiles.update((p) => p.audioCues = value),
         ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+          child: Row(
+            children: [
+              const Icon(Icons.speed, size: 20),
+              Expanded(
+                child: Slider(
+                  value: profile.voiceRate.clamp(0.3, 1.0),
+                  min: 0.3,
+                  max: 1.0,
+                  divisions: 7,
+                  label:
+                      'Voice ${profile.voiceRate.toStringAsFixed(1)}x',
+                  onChanged: (value) =>
+                      profiles.update((p) => p.voiceRate = value),
+                ),
+              ),
+              SizedBox(
+                width: 36,
+                child: Text(
+                  '${profile.voiceRate.toStringAsFixed(1)}x',
+                  style: text.bodySmall,
+                ),
+              ),
+            ],
+          ),
+        ),
         SwitchListTile(
           title: const Text('Travel mode'),
           subtitle: const Text('Prefer local gems and first-time sights.'),

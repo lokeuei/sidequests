@@ -39,4 +39,11 @@ void main() {
     profile.noteNotForMe(_quest);
     expect(profile.weightFor('viewpoints'), 4);
   });
+
+  test('voice rate defaults calm and survives a round trip', () {
+    expect(UserProfile().voiceRate, 0.5);
+    final back =
+        UserProfile.fromJson(UserProfile(voiceRate: 0.7).toJson());
+    expect(back.voiceRate, 0.7);
+  });
 }

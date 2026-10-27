@@ -14,6 +14,7 @@ class QuestCard extends StatelessWidget {
     required this.saved,
     this.onTap,
     this.onSave,
+    this.onExplain,
   });
 
   final ScoredQuest scored;
@@ -21,6 +22,7 @@ class QuestCard extends StatelessWidget {
   final bool saved;
   final VoidCallback? onTap;
   final VoidCallback? onSave;
+  final VoidCallback? onExplain;
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +79,12 @@ class QuestCard extends StatelessWidget {
                             color: onBackground.withValues(alpha: 0.75),
                           ),
                         ),
+                      ),
+                      IconButton(
+                        onPressed: onExplain,
+                        icon: const Icon(Icons.volume_up),
+                        color: onBackground.withValues(alpha: 0.75),
+                        tooltip: 'Mint explains it',
                       ),
                       IconButton(
                         onPressed: onSave,

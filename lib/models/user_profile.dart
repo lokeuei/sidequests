@@ -13,6 +13,7 @@ class UserProfile {
     this.tempUnit = 'c',
     this.nudgeStyle = NudgeStyle.gentle,
     this.audioCues = false,
+    this.voiceRate = 0.5,
     this.travelMode = false,
     this.skillEnabled = true,
     this.suggestWhenTraveling = true,
@@ -35,6 +36,9 @@ class UserProfile {
   String tempUnit;
   NudgeStyle nudgeStyle;
   bool audioCues;
+
+  /// Spoken voice speed, 0.3 to 1.0. 0.5 reads calm and clear.
+  double voiceRate;
   bool travelMode;
   bool skillEnabled;
   bool suggestWhenTraveling;
@@ -87,6 +91,7 @@ class UserProfile {
         'tempUnit': tempUnit,
         'nudgeStyle': nudgeStyle.name,
         'audioCues': audioCues,
+        'voiceRate': voiceRate,
         'travelMode': travelMode,
         'skillEnabled': skillEnabled,
         'suggestWhenTraveling': suggestWhenTraveling,
@@ -134,6 +139,7 @@ class UserProfile {
         orElse: () => NudgeStyle.gentle,
       ),
       audioCues: json['audioCues'] as bool? ?? false,
+      voiceRate: (json['voiceRate'] as num?)?.toDouble() ?? 0.5,
       travelMode: json['travelMode'] as bool? ?? false,
       skillEnabled: json['skillEnabled'] as bool? ?? true,
       suggestWhenTraveling: json['suggestWhenTraveling'] as bool? ?? true,
@@ -145,6 +151,3 @@ class UserProfile {
 }
 
 enum NudgeStyle { gentle, bold }
-
-
-

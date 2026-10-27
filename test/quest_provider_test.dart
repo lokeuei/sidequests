@@ -134,7 +134,7 @@ void main() {
     final events = _RecordingEvents()..items = [_gig];
     final quests = _provider(places, events);
     await quests.refresh(UserProfile(), autoNudge: false);
-    expect(await quests.brief(), 'Speaking your brief.');
+    expect(await quests.brief(UserProfile()), 'Speaking your brief.');
   });
 
   test('brief text names three in order', () {
@@ -144,5 +144,23 @@ void main() {
     expect(text, "Here's your brief. First, Riverside Gig. On Saturday.");
     expect(buildBrief([]), 'Nothing to brief yet.');
   });
-}
 
+  test('explain reads one quest aloud', () async {
+    final places = _RecordingPlaces();
+    final events = _RecordingEvents()..items = [_gig];
+    final quests = _provider(places, events);
+    await quests.refresh(UserProfile(), autoNudge: false);
+    expect(
+      await quests.explainQuest(_gig, UserProfile()),
+      'Mint is explaining it.',
+    );
+  });
+
+  test('quest speech covers the essentials', () {
+    final text = buildQuestSpeech(_gig);
+    expect(text, startsWith('Riverside Gig.'));
+    expect(text, contains('Pier Hall'));
+    expect(text, contains('On Saturday.'));
+    expect(text, contains('Best Saturday.'));
+  });
+}
