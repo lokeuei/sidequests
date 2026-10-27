@@ -13,6 +13,7 @@ import 'package:sidequests/state/quest_provider.dart';
 import 'package:sidequests/widgets/app_logo.dart';
 import 'package:sidequests/widgets/context_row.dart';
 import 'package:sidequests/widgets/enter_animation.dart';
+import 'package:sidequests/widgets/muse_avatar.dart';
 import 'package:sidequests/widgets/quest_art.dart';
 import 'package:sidequests/widgets/quest_card.dart';
 import 'package:sidequests/widgets/quest_map.dart';
@@ -310,7 +311,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'For You',
           ),
           NavigationDestination(
-            icon: AppLogo(size: 24),
+            icon: MuseAvatar(size: 26),
+            selectedIcon: MuseAvatar(size: 26),
             label: 'Muse',
           ),
           NavigationDestination(
@@ -995,12 +997,25 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
       children: [
-        Text('Muse', style: text.displayMedium).enter(context),
-        const SizedBox(height: 6),
-        Text(
-          'Your taste, in one place. Muse ranks with this.',
-          style: text.bodyMedium,
-        ).enter(context, delayMs: 60),
+        Row(
+          children: [
+            const MuseAvatar(size: 56),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Muse', style: text.displayMedium),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Your taste, in one place. Muse ranks with this.',
+                    style: text.bodyMedium,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ).enter(context),
         const SizedBox(height: 18),
         Container(
           padding: const EdgeInsets.all(16),

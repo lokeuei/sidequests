@@ -65,6 +65,7 @@ class SidequestsApp extends StatelessWidget {
         title: 'Sidequests',
         theme: AppTheme.light(),
         darkTheme: AppTheme.dark(),
+        themeMode: ThemeMode.light,
         home: const SplashScreen(),
       ),
     );
