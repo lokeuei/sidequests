@@ -92,6 +92,7 @@ class QuestDetailScreen extends StatelessWidget {
                   point: questPoint(lat, lng, quest, 0),
                   label: quest.title,
                   questId: quest.id,
+                  category: quest.category,
                 ),
               ],
               userPoint: LatLng(lat, lng),

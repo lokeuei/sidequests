@@ -11,19 +11,19 @@ AI that reconnects you with the real world instead of pulling you away from it.
 
 ## What v1 does (Pixel 9 / Android)
 
-- **Explore tab**: a short, ranked list of live quests "right now", with a
+- **Nearby + For You tabs**: a short, ranked list of live quests "right now", with a
   plain-language reason for each ("golden hour light, made for tonight").
 - **Automatic context**: device location (with permission), keyless weather
   from Open-Meteo, time of day, and travel detection. No weather API key needed.
 - **Nudges**: local notifications for the top quest; a louder style when
   "Bold" is on. Turn on Audio cues and the system voice reads them aloud.
-- **You tab**: name, interests ("love" / "less of"), temperature unit, nudge
+- **Settings tab**: name, interests ("love" / "less of"), temperature unit, nudge
   style, travel mode, saved quests, and a reset. By default Muse learns from
   taps, saves, dismissals, and "Let's go" presses. Explicit settings improve
   its picks.
 - **Travel mode**: when you're >80 km from home (or toggle it manually),
   rankings lean into local gems. Muse can suggest turning it on.
-- **Muse picks**: paste a Meta Model API key once in the You tab and the app
+- **Muse picks**: paste a Meta Model API key once in the Settings tab and the app
   sends Muse the date, time, weather, your prefs, and the live list, and Muse
   ranks it. Without a key the local ranker covers, using the same contract in
   `muse-skill/`.
@@ -32,7 +32,7 @@ AI that reconnects you with the real world instead of pulling you away from it.
   weather block with hourly and daily rows. Pins open quest details on tap.
 - **Look elsewhere**: tap the map or type a place ("Bellevue", "Seatac") to
   search around that point instead of your GPS spot. Clear the chip to come back.
-- **Visible learning**: the You tab shows what Muse noticed you love and skip.
+- **Visible learning**: the Settings tab shows what Muse noticed you love and skip.
 - **Feedback**: each quest asks how it went. Went, loved it, not for me.
 - **Proactive nudges**: loved-genre gig alerts and weekend ideas, plus golden
   hour, all with quiet hours and no repeats.
@@ -42,7 +42,7 @@ AI that reconnects you with the real world instead of pulling you away from it.
 - **Background nudges**: a periodic check sends a golden-hour nudge even with
   the app closed. Quiet hours are 10 PM to 8 AM.
 - **Events (needs key)**: Ticketmaster gigs near you once you paste a free API
-  key in the You tab. See the setup guide.
+  key in the Settings tab. See the setup guide.
 
 ## Quickstart
 
@@ -56,7 +56,7 @@ flutter pub get
 flutter run                                # pick your Pixel 9
 ```
 
-Keys go in the You tab on the phone, no flags needed. Builders can also bake
+Keys go in the Settings tab on the phone, no flags needed. Builders can also bake
 them in:
 
 ```sh

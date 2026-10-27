@@ -49,7 +49,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
       children: [
-        Text('You', style: text.displayMedium).enter(context),
+        Text('Settings', style: text.displayMedium).enter(context),
         const SizedBox(height: 6),
         Text(
           'Muse learns from your taps, saves, and strolls. '

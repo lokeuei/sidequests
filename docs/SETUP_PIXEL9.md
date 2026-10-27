@@ -91,7 +91,7 @@ Gigs and shows come from Ticketmaster, which needs a free key:
 
 1. Sign up at <https://developer.ticketmaster.com> and make an app to get
    a consumer key (called the API key on their site).
-2. Paste it into the You tab under Keys. It stays on your phone.
+2. Paste it into the Settings tab under Keys. It stays on your phone.
 
 Without the key the app simply skips events. Everything else works.
 Builders can also bake it in with
@@ -103,7 +103,7 @@ Muse ranking needs a Meta Model API key:
 
 1. Sign up in the Meta Developer Console (linked from the Meta Model API
    docs) and create a key. New accounts get free credits to start.
-2. Paste it into the You tab under Keys. It stays on your phone.
+2. Paste it into the Settings tab under Keys. It stays on your phone.
 3. Optional: pick the model with `--dart-define=MUSE_MODEL=muse-spark-1.1`
    (Spark) or the Wonder id shown in the console. The default is Spark 1.1.
 
