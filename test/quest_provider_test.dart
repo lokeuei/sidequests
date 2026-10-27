@@ -114,4 +114,17 @@ void main() {
     await quests.refresh(UserProfile(), autoNudge: false);
     expect(quests.liveGigs, isFalse);
   });
+
+  test('refresh narrates its phases and goes quiet', () async {
+    final places = _RecordingPlaces();
+    final events = _RecordingEvents()..items = [_gig];
+    final quests = _provider(places, events);
+    final seen = <String>[];
+    quests.addListener(() => seen.add(quests.loadStatus));
+    await quests.refresh(UserProfile(), autoNudge: false);
+    expect(seen, contains('Reading location…'));
+    expect(seen, contains('Looking around…'));
+    expect(seen, isNot(contains('Asking Muse…')));
+    expect(quests.loadStatus, isEmpty);
+  });
 }

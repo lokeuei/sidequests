@@ -139,6 +139,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final quests = context.watch<QuestProvider>();
+    final showStatus =
+        _tab == 0 && quests.loading && quests.loadStatus.isNotEmpty;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -162,8 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () async {
               final profiles = context.read<ProfileProvider>();
-              final quests = context.read<QuestProvider>();
-              await quests.sendNudge(profiles.profile);
+              final questState = context.read<QuestProvider>();
+              await questState.sendNudge(profiles.profile);
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -173,6 +176,24 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ],
+        bottom: showStatus
+            ? PreferredSize(
+                preferredSize: const Size.fromHeight(30),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        quests.loadStatus,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                    const LinearProgressIndicator(),
+                  ],
+                ),
+              )
+            : null,
       ),
       body: _tab == 0 ? _buildExplore(context) : const PreferencesScreen(),
       bottomNavigationBar: NavigationBar(
@@ -232,12 +253,6 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
         children: [
-          SizedBox(
-            height: 12,
-            child: quests.loading && quests.hasLoaded
-                ? const LinearProgressIndicator()
-                : const SizedBox.shrink(),
-          ),
           Text(
             _dateLine(now),
             style: text.bodySmall?.copyWith(

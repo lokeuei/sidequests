@@ -35,6 +35,10 @@ class QuestProvider extends ChangeNotifier {
   bool liveGigs = false;
   bool museUsed = false;
 
+  /// What the current refresh is doing. Empty when idle. The app bar
+  /// shows it so users know to wait.
+  String loadStatus = '';
+
   /// True once a refresh finished (even an empty one). The UI only shows
   /// the blocking loader before the first finish; later reloads keep
   /// the old content up with a thin progress bar.
@@ -55,8 +59,13 @@ class QuestProvider extends ChangeNotifier {
   bool _autoNudged = false;
   final List<String> _dismissed = [];
 
+  bool _hasMuseKey(UserProfile profile) =>
+      profile.museApiKey.trim().isNotEmpty ||
+      const String.fromEnvironment('MUSE_API_KEY').isNotEmpty;
+
   Future<void> refresh(UserProfile profile, {bool autoNudge = true}) async {
     loading = true;
+    loadStatus = 'Reading location…';
     notifyListeners();
     try {
       // Around a search point the coords are already known, so context,
@@ -67,6 +76,8 @@ class QuestProvider extends ChangeNotifier {
       final sLat = searchLat;
       final sLon = searchLon;
       if (sLat != null && sLon != null) {
+        loadStatus = 'Looking around…';
+        notifyListeners();
         final (dev, f, g) = await (
           contextService.current(),
           places.nearby(sLat, sLon),
@@ -80,6 +91,8 @@ class QuestProvider extends ChangeNotifier {
         final lat = device.latitude;
         final lon = device.longitude;
         if (lat != null && lon != null) {
+          loadStatus = 'Looking around…';
+          notifyListeners();
           final (f, g) = await (
             places.nearby(lat, lon),
             events.upcoming(lat, lon, apiKey: profile.ticketmasterKey),
@@ -119,6 +132,10 @@ class QuestProvider extends ChangeNotifier {
       var line = _describe(context, profile);
       museUsed = false;
       if (candidates.isNotEmpty) {
+        if (_hasMuseKey(profile)) {
+          loadStatus = 'Asking Muse…';
+          notifyListeners();
+        }
         final suggestion = await MuseBrain().suggest(
           profile: profile,
           now: now,
@@ -156,6 +173,7 @@ class QuestProvider extends ChangeNotifier {
         await sendNudge(profile);
       }
     } finally {
+      loadStatus = '';
       hasLoaded = true;
       loading = false;
       notifyListeners();
