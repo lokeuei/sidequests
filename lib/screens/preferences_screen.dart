@@ -80,14 +80,16 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
               FilterChip(
                 label: Text(interest),
                 selected: profile.interests.contains(interest),
-                onSelected: (selected) => profiles.update((p) {
-                  if (selected) {
-                    p.interests.add(interest);
-                    p.avoid.remove(interest);
-                  } else {
-                    p.interests.remove(interest);
-                  }
-                }),
+                onSelected: profile.avoid.contains(interest)
+                    ? null
+                    : (selected) => profiles.update((p) {
+                          if (selected) {
+                            p.interests.add(interest);
+                            p.avoid.remove(interest);
+                          } else {
+                            p.interests.remove(interest);
+                          }
+                        }),
               ),
           ],
         ),
@@ -102,14 +104,16 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
               FilterChip(
                 label: Text(interest),
                 selected: profile.avoid.contains(interest),
-                onSelected: (selected) => profiles.update((p) {
-                  if (selected) {
-                    p.avoid.add(interest);
-                    p.interests.remove(interest);
-                  } else {
-                    p.avoid.remove(interest);
-                  }
-                }),
+                onSelected: profile.interests.contains(interest)
+                    ? null
+                    : (selected) => profiles.update((p) {
+                          if (selected) {
+                            p.avoid.add(interest);
+                            p.interests.remove(interest);
+                          } else {
+                            p.avoid.remove(interest);
+                          }
+                        }),
               ),
           ],
         ),

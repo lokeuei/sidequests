@@ -198,6 +198,9 @@ class QuestProvider extends ChangeNotifier {
     return 'Speaking your brief.';
   }
 
+  /// Stops brief speech.
+  Future<void> stopSpeaking() => notifications.stop();
+
   void setSearchPoint(double lat, double lon, String label) {
     searchLat = lat;
     searchLon = lon;

@@ -142,6 +142,22 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _speakBrief() async {
+    final quests = context.read<QuestProvider>();
+    final message = await quests.brief();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 12),
+        action: SnackBarAction(
+          label: 'Stop',
+          onPressed: () => quests.stopSpeaking(),
+        ),
+      ),
+    );
+  }
+
   void _openFilters() {
     showModalBottomSheet<void>(
       context: context,
@@ -169,14 +185,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       FilterChip(
                         label: Text(interest),
                         selected: profile.interests.contains(interest),
-                        onSelected: (selected) => profiles.update((p) {
-                          if (selected) {
-                            p.interests.add(interest);
-                            p.avoid.remove(interest);
-                          } else {
-                            p.interests.remove(interest);
-                          }
-                        }),
+                        onSelected: profile.avoid.contains(interest)
+                            ? null
+                            : (selected) => profiles.update((p) {
+                                  if (selected) {
+                                    p.interests.add(interest);
+                                    p.avoid.remove(interest);
+                                  } else {
+                                    p.interests.remove(interest);
+                                  }
+                                }),
                       ),
                   ],
                 ),
@@ -339,19 +357,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final lng = quests.searchLon ?? deviceLng;
     final away = quests.searchingElsewhere;
     final hasMap = lat != null && lng != null;
-
-    if (quests.loading && quests.quests.isEmpty && !quests.hasLoaded) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            Text('Reading the sky…', style: text.bodyMedium),
-          ],
-        ),
-      );
-    }
 
     final tempUnit = profiles.profile.tempUnit;
     final weatherLine = weather == null
@@ -884,19 +889,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final now = DateTime.now();
     final weather = quests.device.weather;
 
-    if (quests.loading && quests.quests.isEmpty && !quests.hasLoaded) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            Text('Reading the sky…', style: text.bodyMedium),
-          ],
-        ),
-      );
-    }
-
     return RefreshIndicator(
       onRefresh: () => _refresh(autoNudge: false),
       child: ListView(
@@ -956,15 +948,8 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FilledButton.tonalIcon(
-                onPressed: quests.quests.isEmpty
-                    ? null
-                    : () async {
-                        final message = await quests.brief();
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(message)),
-                        );
-                      },
+                onPressed:
+                    quests.quests.isEmpty ? null : _speakBrief,
                 icon: const Icon(Icons.campaign),
                 label: const Text('Brief me'),
               ),
@@ -1074,15 +1059,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               FilledButton.tonalIcon(
-                onPressed: quests.quests.isEmpty
-                    ? null
-                    : () async {
-                        final message = await quests.brief();
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(message)),
-                        );
-                      },
+                onPressed:
+                    quests.quests.isEmpty ? null : _speakBrief,
                 icon: const Icon(Icons.campaign),
                 label: const Text('Brief me'),
               ),
@@ -1219,5 +1197,4 @@ class _HomeScreenState extends State<HomeScreen> {
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
   }
-
 }

@@ -34,7 +34,7 @@ class NotificationService {
     try {
       _tts = FlutterTts();
       await _tts!.setLanguage('en-US');
-      await _tts!.setSpeechRate(0.95);
+      await _tts!.setSpeechRate(0.8);
     } catch (_) {
       _tts = null;
     }
@@ -92,6 +92,14 @@ class NotificationService {
     if (_memory || _tts == null) return;
     try {
       await _tts!.speak(text);
+    } catch (_) {}
+  }
+
+  /// Stops any in-progress speech.
+  Future<void> stop() async {
+    if (_memory || _tts == null) return;
+    try {
+      await _tts!.stop();
     } catch (_) {}
   }
 }
