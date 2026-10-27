@@ -55,7 +55,7 @@ out center 30;
           },
         );
       }
-      return done.future;
+      return await done.future;
     } finally {
       if (client == null) httpClient.close();
     }
